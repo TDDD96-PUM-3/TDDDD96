@@ -16,7 +16,7 @@ function Statistics() {
 export default function App() {
   return (
     <>
-      <nav style={{ display: "flex", gap: 12, padding: 12 }}>
+      <nav style={{ display: "flex", gap: 12, padding: 12 }}> 
         <Link to="/">Home</Link>
         <Link to="/Results">Results</Link>
         <Link to="/Login">Login</Link>
