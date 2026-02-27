@@ -40,3 +40,18 @@
 .read-the-docs {
   color: #888;
 }
+
+.search-form {
+  display: flex;
+  gap: 10px;
+}
+
+.search-input {
+  padding: 8px;
+  width: 250px;
+}
+
+.search-button {
+  padding: 8px 16px;
+  cursor: pointer;
+}

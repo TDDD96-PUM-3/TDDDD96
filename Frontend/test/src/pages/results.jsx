@@ -1,8 +1,13 @@
+import { useLocation } from "react-router-dom";
+
 export default function Results() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const query = params.get("query");
+
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Results</h1>
-      <p>Show search results here.</p>
+    <div>
+      <h2>Results for: {query}</h2>
     </div>
   );
 }
