@@ -1,8 +1,22 @@
-export default function Login() {
+import { useNavigate } from "react-router-dom";
+import Login from "../components/LoginBoxes.jsx";
+import "./search.css";
+
+export default function Search() {
+  const navigate = useNavigate();
+
   return (
-    <div style={{ padding: 16 }}>
-      <h1>LOGIN</h1>
-      <p>BRUTHER.</p>
+    <div className="login-container">
+      <Login />
+
+      <div className="text-center mt-3">
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate("/results")}
+        >
+          Go To Results
+        </button>
+      </div>
     </div>
   );
 }
