@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
+import "./search.css";
 
 export default function Search() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export default function Search() {
   };
 
   return (
-    <div>
+    <div className="search-container">
       <h1>Search Page</h1>
 
       <SearchBar onSearch={handleSearch} />
