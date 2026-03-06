@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import requests
+#import requests
 import re
 
 from selenium import webdriver
