@@ -37,7 +37,7 @@ function Login() {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" className="w-100">
+            <Button variant="primary" type="submit" className="login-btn w-100">
               Login
             </Button>
           </Form>
