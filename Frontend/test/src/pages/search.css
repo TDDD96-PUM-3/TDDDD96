@@ -5,3 +5,16 @@
   align-items: center;
   height: 51vh;
 }
+
+.search-icon-box {
+  background-color: #025f3a !important;
+  cursor: pointer;
+}
+
+.search-icon-box svg {
+  color: white !important;
+}
+
+.search-icon-box:hover {
+  background-color: #067a3c !important;
+}

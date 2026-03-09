@@ -11,13 +11,10 @@ export default function Search() {
 
   return (
     <div className="search-container">
-      <h1>Search Page</h1>
+      <h1>Search</h1>
 
       <SearchBar onSearch={handleSearch} />
 
-      <button onClick={() => navigate("/results")}>
-        Go To Results
-      </button>
     </div>
   );
 }
