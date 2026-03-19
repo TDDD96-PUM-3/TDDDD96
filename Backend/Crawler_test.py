@@ -8,7 +8,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
 from time import sleep
 
-from urllib.parse import urlparse, parse_qs, urlencode, urlunparse, unquote
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse, unquote, urljoin
 
 import logging
 import re
@@ -140,12 +140,56 @@ MARKETPLACE_PATTERNS = {
     },
 }
 
-def print_data(link, name, links_to_explore):
-    # Save the link to explore later
-    if name == "amazon":
-        clean_link = clean_amazon_url(link)
-    elif name == "facebook":
-        clean_link = clean_facebook_url(link)
+# ── Input validation ───────────────────────────────────────────────────────────
+
+def is_valid_url(url: str) -> bool:
+    """Return True only if url has a scheme (http/https) and a non-empty netloc."""
+    try:
+        parsed = urlparse(url)
+        return parsed.scheme in ("http", "https") and bool(parsed.netloc)
+    except Exception:
+        return False
+
+
+def is_navigable_href(href: str) -> bool:
+    """
+    Return False for hrefs that are not real page URLs:
+    empty strings, anchors (#), javascript: pseudo-links, mailto:, tel:, etc.
+    """
+    if not href:
+        return False
+    stripped = href.strip()
+    if stripped in ("#", "/"):
+        return False
+    lowered = stripped.lower()
+    for prefix in ("javascript:", "mailto:", "tel:", "data:", "blob:"):
+        if lowered.startswith(prefix):
+            return False
+    return True
+
+
+# ── Data Printing Helpers ───────────────────────────────────────────────────────
+
+
+def clean_url(href: str, website_name: str, page_url: str) -> str:
+    # Normalise href to an absolute URL.
+    if website_name == "amazon":
+        return clean_amazon_url(href)
+    if website_name == "facebook":
+        return clean_facebook_url(href)
+    else: 
+        # Generic fallback: resolve relative URLs against the current page URL
+        return urljoin(page_url, href)
+
+
+def print_data(href, website_name, links_to_explore, visited_links: set, current_url: str):
+    # Clean the URL based on the website's domain
+    clean_link = clean_url(href, website_name, current_url)
+
+    # Skip if already queued or visited
+    if clean_link in visited_links or clean_link in links_to_explore:
+        return
+
     links_to_explore.add(clean_link)
 
     #Show the title and link for the main products on the page
@@ -153,11 +197,14 @@ def print_data(link, name, links_to_explore):
     print('---')
 
 
-def get_links_data(soup, name, links_to_explore):
+def get_links_data(soup, website_name, links_to_explore, visited_links: set, current_url: str):
     for a in soup.find_all('a', href=True):
-        link = a['href']
+        href = a['href']
         # Save the link to explore later
-        print_data(link, name, links_to_explore)
+        if not is_navigable_href(href):
+            continue
+
+        print_data(href, website_name, links_to_explore, visited_links, current_url)
     
     
 
@@ -167,14 +214,25 @@ def search_new_link(driver,url):
         sleep(1)  # Wait for the page to load before exploring the next link
         html = driver.page_source        # Pass the HTML to BeautifulSoup
         soup = BeautifulSoup(html, 'html.parser')
-
         return soup
     except WebDriverException as e:
         logging.exception("WebDriver error:", e)
+        return None
 
 
-def get_data(url, name, base  = None):
+def get_data(url, website_name, base  = None):
+    # ── Input validation ──────────────────────────────────────────────────────
+    if not is_valid_url(url):
+        logging.error("Invalid URL provided: %s", url)
+        return set()
+
+    if website_name == "unknown":
+        logging.error("Unknown marketplace for URL: %s — aborting crawl.", url)
+        return set()
+
+    # ─ Setup ───────────────────────────────────────────────────────────────
     links_to_explore = set()
+    visited_links = set()
     deapth = 0
 
     options = Options()
@@ -185,25 +243,35 @@ def get_data(url, name, base  = None):
 
     try:
         if base:
-            driver.get(base)
-            sleep(3)  # Wait for the page to load
+            if not is_valid_url(base):
+                logging.warning("Invalid base URL provided: %s — skipping.", base)
+            else:
+                driver.get(base)
+                sleep(3)  # Wait for the page to load
+                
         soup = search_new_link(driver, url)  # Load the page
-    except WebDriverException as e:
-        logging.exception("WebDriver error:", e)
+        if soup is None:
+            logging.error("Failed to load initial URL: %s", url)
+            return set()
 
-    # Explore the search results and get the links to the product pages
-    get_links_data(soup, name, links_to_explore)
+        # Explore the search results and get the links to the product pages
+        visited_links.add(url)
+        get_links_data(soup, website_name, links_to_explore)
 
-    while len(links_to_explore) > 0 and deapth < 1:
-        link = links_to_explore.pop()  # Get the first link from the list
-        soup = search_new_link(driver,link)  # Load the product page  # Wait for the page to load before exploring the next link
-        if soup != None:
-            get_links_data(soup, name, links_to_explore)
-        deapth += 1
+        # ── Crawl loop ────────────────────────────────────────────────────
+        while len(links_to_explore) > 0 and deapth < 1:
+            link = links_to_explore.pop()  # Get the first link from the list
+            visited_links.add(link)  # Mark the link as visited 
+            
+            soup = search_new_link(driver,link)  # Load the product page  # Wait for the page to load before exploring the next link
+            if soup != None:
+                get_links_data(soup, website_name, links_to_explore, visited_links, link)
+            deapth += 1
 
-    driver.quit()  # Close the browser when done
+    finally:
+        driver.quit()  # Close the browser when done
 
-    return links_to_explore
+    return visited_links
 
 # ── URL Cleaning Helpers ─────────────────────────────────────────────────────
 
@@ -247,12 +315,11 @@ def clean_facebook_url(href: str) -> str:
 
 def get_marketplace(url: str) -> str | None:
     """Return marketplace name by checking if its keyword appears in the hostname."""
-    from urllib.parse import urlparse
     hostname = urlparse(url).netloc.lower()
 
-    for name, config in MARKETPLACE_PATTERNS.items():
+    for website_name, config in MARKETPLACE_PATTERNS.items():
         if config["domain_keyword"] in hostname:
-            return name
+            return website_name
 
     return None
 
@@ -278,15 +345,17 @@ if __name__ == "__main__":
     url = "https://www.amazon.com/s?k=mölnlycke"
     #url = "https://www.facebook.com/marketplace/?locale=sv_SE"
 
-    name = get_marketplace(url) or "unknown"
+    website_name = get_marketplace(url) or "unknown"
 
-    test_urls = get_data(url, name, base)
+    # website_name must be sent because the url might not contain the domain (e.g. amazon.com) 
+    # and the cleanup would thereby not know which function to use
+    test_urls = get_data(url, website_name, base)
     number_of_products = 0
     
     for url in test_urls:
         result = "✅" if is_product_url(url) else "❌"
         if result == "✅":
             number_of_products += 1
-            print(f"{result} [{name:12}] {url}")
+            print(f"{result} [{website_name:12}] {url}")
 
     print(f"Total number of products found: {number_of_products}")
