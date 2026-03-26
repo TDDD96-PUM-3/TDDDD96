@@ -1,4 +1,5 @@
 import { useLocation } from "react-router-dom";
+import "./results.css";
 
 export default function Results() {
   const location = useLocation();
@@ -7,7 +8,7 @@ export default function Results() {
 
   return (
     <div>
-      <h2>Results for: {query}</h2>
+      <h2 className="results-title">Results for: {query || "nothing"}</h2>
     </div>
   );
 }
