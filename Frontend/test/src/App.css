@@ -13,42 +13,42 @@ body {
   display: flex;
   align-items: center;
   padding: 16px 24px;
-  background-color: #025f3a;
+  background-color: #00402f;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .logo {
   margin: 0;
   margin-right: auto;
-  color: white;
+  margin-left: 5%;
+  color: #009c14;
   font-size: 1.4rem;
 }
 
 .topbar-links {
   display: flex;
-  gap: 12px;
+  gap: 55px;
+  padding-right: 5%;
 }
 
 .topbar-link {
-  color: #d1d5db;
+  color: white;
   text-decoration: none;
+  font-size: large;
   padding: 8px 14px;
-  border-radius: var(--bs-border-radius);
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.topbar-link:visited {
-  color: #d1d5db;
+  /*border-radius: var(--bs-border-radius);*/
+  /*transition: background-color 0.2s ease, color 0.2s ease;*/
 }
 
 .topbar-link:hover {
-  color: white;
-  background-color: #374151;
+  /*color: white;*/
+  /*background-color: #374151;*/
+  text-decoration: underline;
 }
 
 .topbar-link.active {
-  color: white;
-  background-color: #067a3c;
+  color: #97ff6f;
+  /*background-color: #067a3c;*/
 }
 
 .page-content {
