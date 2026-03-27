@@ -9,6 +9,7 @@
 .search-icon-box {
   background-color: #025f3a !important;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .search-icon-box svg {

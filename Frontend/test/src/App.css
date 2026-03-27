@@ -51,6 +51,18 @@ body {
   /*background-color: #067a3c;*/
 }
 
+.logout-link {
+  border-radius: var(--bs-border-radius);
+  background-color: #025f3a;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.logout-link:hover {
+  background-color: #067a3c !important;
+
+}
+
+
 .page-content {
   max-width: auto;
   margin: 0 auto;

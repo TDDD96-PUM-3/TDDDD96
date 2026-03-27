@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log("Login attempted with:", { email, password });
     // skicka request till server??
+    navigate("/search");
   };
 
   return (
@@ -37,7 +40,7 @@ function Login() {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" className="login-btn w-100">
+            <Button variant="primary" type="submit" className="login-btn w-100" onClick={Login}>
               Login
             </Button>
           </Form>
