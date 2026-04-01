@@ -14,7 +14,7 @@ export default function App() {
     <div className="app">
       {!isLoginPage && (
         <nav className="topbar">
-          <h2 className="logo">Counterfeit Detector 3000</h2>
+          <h2 className="logo">CounterfeitDetector</h2>
 
           <div className="topbar-links">
             <NavLink
