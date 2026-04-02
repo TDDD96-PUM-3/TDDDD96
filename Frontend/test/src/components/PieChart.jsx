@@ -1,7 +1,7 @@
 import { PieChart as MuiPieChart } from "@mui/x-charts/PieChart";
-import { valueFormatter } from "./test_data";
 
-export default function PieChart({data}) {
+
+export default function PieChart({ data }) {
   return (
     <MuiPieChart
       series={[
@@ -9,18 +9,17 @@ export default function PieChart({data}) {
           data,
           highlightScope: { fade: "global", highlight: "item" },
           faded: { innerRadius: 0, additionalRadius: -15, color: "gray" },
-          valueFormatter,
         },
       ]}
-      colors={["#025F3A", "#FF9F1C", "#FF9800", "#9C27B0", "#607D8B"]}
+      colors={["#025F3A", "#97FF6F","#FF9800", "#607D8B"]}
       width={300}
       height={300}
       slotProps={{
         legend: {
-          direction: "row",      
+          direction: "row",
           position: {
-            vertical: "bottom",  
-            horizontal: "middle"
+            vertical: "top",
+            horizontal: "middle",
           },
         },
       }}

@@ -7,6 +7,7 @@ export default function Search() {
 
   const handleSearch = (query) => {
     navigate(`/results?query=${query}`);
+    // navigate(`/statistics?query=${query}`);
   };
 
   return (

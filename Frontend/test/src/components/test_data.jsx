@@ -3,40 +3,42 @@
 // And https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet/worldwide/2023
 // For the month of December 2023
 
-export const desktopOS = [
+export const test = [
   {
     label: "Counterfeits",
-    value: 70,
+    value: 6769,
   },
   {
     label: "Non-counterfeits",
-    value: 30,
+    value: 3331,
   },
 ];
 
-export const test = [
+export const test1 = [
   {
-    label: "test1", value: 67,
+    label: "Counterfeits", value: 50,
   },
   {
-    label: "test2", value: 33,
+    label: "Non-counterfeits", value: 300,
   }
 ];
 
 export const test2 = [
   {
-    label: "test1", value: 67,
+    label: "Counterfeits", value: 6767,
   },
   {
-    label: "test2", value: 33,
+    label: "Non-counterfeits", value: 3333,
   },
-  {
-    label: "test3", value: 45,
-  },
-  {
-    label: "test4", value: 420,
-  }
 ];
 
+export const test3 = [
+  {
+    label: "Counterfeits", value: 6868,
+  },
+  {
+    label: "Non-counterfeits", value: 3232,
+  },
+]
 
 export const valueFormatter = (item) => `${item.value}%`;

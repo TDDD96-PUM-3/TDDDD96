@@ -1,0 +1,31 @@
+.pie-charts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 50px;
+    justify-items: center;
+    margin-Top: 50px;
+}
+
+.pie {
+    display: flex;
+    /*ewwww*/
+    flex-direction: column;
+    /* vertical-align: middle; */
+    justify-content: center;
+    align-items: center;
+    font-size: 20v;
+    /*ewwww*/
+
+
+    /*ewwww*/
+    h6 {
+        font-weight: normal;
+        font-style: italic;
+    }
+
+    gap: 10px
+}
+
+.statistics-container {
+    padding: 16px;
+}
