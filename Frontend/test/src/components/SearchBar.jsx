@@ -18,7 +18,7 @@ export default function SearchBar({ onSearch }) {
             <InputGroup>
               <Form.Control
                 type="text"
-                placeholder="Enter url..."
+                placeholder="Enter URL..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />

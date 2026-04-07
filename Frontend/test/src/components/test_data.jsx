@@ -41,4 +41,4 @@ export const test3 = [
   },
 ]
 
-export const valueFormatter = (item) => `${item.value}%`;
+export const valueFormatter = (item) => `${item.value}%`; //används inte längre 
