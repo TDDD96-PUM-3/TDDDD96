@@ -1,0 +1,24 @@
+services:
+  frontend:
+    build: ./Frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    networks:
+      - app-network
+
+  backend:
+    build: ./Backend
+    ports:
+      - "8000:8000"
+    shm_size: '2gb'
+    networks:
+      - app-network
+
+#  Add database as service
+
+networks:
+  app-network:
+    driver: bridge

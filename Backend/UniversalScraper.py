@@ -5,6 +5,8 @@ A site-agnostic scraper built on Selenium + BeautifulSoup.
 No hardcoded site configs — everything is detected at runtime.
 """
 
+from itertools import product
+from collections import Counter
 import logging
 import re
 from time import sleep
@@ -17,6 +19,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.service import Service
 
 from itertools import chain
 
@@ -25,13 +28,11 @@ log = logging.getLogger(__name__)
 
 # -- Copilot kokade ? Är menat att hjälpa sortera bilder -------------------------------------------------------
 
-import re
-from collections import Counter
-from itertools import product
 
 # -----------------------------
 # Helper: Convert a character to a regex class (paper Stage 1)
 # -----------------------------
+
 def char_to_regex(c):
     if c.isdigit():
         return r"\d"
@@ -47,7 +48,7 @@ def char_to_regex(c):
 
 # -----------------------------
 # Helper: Convert full string into generalized regex tokens
-# Similar—but simplified—to Stage 1 of the paper
+# Similar—but simplified—to Stage 1 of the paperfrom selenium.webdriver.chrome.service import Service
 # -----------------------------
 def generalize_string(s):
     return "".join(char_to_regex(c) for c in s)
@@ -154,6 +155,8 @@ def is_navigable_href(href: str) -> bool:
                    ("#", "/", "javascript:", "mailto:", "tel:", "data:", "blob:"))
 
 # Unnecessary?
+
+
 def get_domain(url: str) -> str:
     p = urlparse(url)
     return f"{p.scheme}://{p.netloc}"
@@ -174,22 +177,21 @@ def resolve_url(href: str, base_url: str) -> str | None:
 
 # ── Browser setup ──────────────────────────────────────────────────────────────
 
+
 def build_driver(headless: bool = True) -> webdriver.Chrome:
     options = Options()
     if headless:
         options.add_argument("--headless")
         options.add_argument("--disable-gpu")
-
-    # Docker-friendly options (also generally good practice for scraping)
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    # Avoid cookies on the users device
     options.add_argument("--incognito")
-    # Avoid bot detection
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
-    return webdriver.Chrome(options=options)
+
+    service = Service("/usr/bin/chromedriver")
+    return webdriver.Chrome(service=service, options=options)
 
 
 # ── Generic popup removal ──────────────────────────────────────────────────────
@@ -222,12 +224,15 @@ _HARDCODED_XPATHS = [
 ]
 
 # BOTTLE NECK FOR SPEEEEED, OPTIMIZE by knowing when to use?
+
+
 def remove_popups(driver: webdriver.Chrome) -> None:
     """Try to dismiss any generic overlay/popup/cookie banner."""
-    sleep(2) # Wait for website to load
+    sleep(2)  # Wait for website to load
     for xpath in chain(_HARDCODED_XPATHS, _POPUP_SELECTORS):
         try:
-            btn = WebDriverWait(driver, 0.5).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            btn = WebDriverWait(driver, 0.5).until(
+                EC.element_to_be_clickable((By.XPATH, xpath)))
             btn.click()
             log.info("Dismissed popup via: %s", xpath)
         except Exception:
@@ -239,7 +244,8 @@ def remove_popups(driver: webdriver.Chrome) -> None:
 def wait_for_page(driver: webdriver.Chrome, timeout: int) -> bool:
     """Wait until document.readyState == 'complete'. Returns False on timeout."""
     try:
-        WebDriverWait(driver, timeout).until(lambda d: d.execute_script("return document.readyState") == "complete")
+        WebDriverWait(driver, timeout).until(lambda d: d.execute_script(
+            "return document.readyState") == "complete")
         return True
     except TimeoutException:
         log.warning("Page load timed out after %ds.", timeout)
@@ -270,9 +276,12 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
     images = set()
     # Match common image extensions in URLs (e.g. ?fmt=jpg)
     img_ext = re.compile(
-        r'\.(jpg|jpeg|png|webp|gif|svg|pjpeg)(\?[^&]*)?(&.*)?$'  # extension anywhere before params
-        r'|[?&]fmt=(jpg|jpeg|png|webp|gif|svg|pjpeg)'             # fmt= query param
-        r'|/is/image/',                                            # Scene7 / AEM image URLs
+        # extension anywhere before params
+        r'\.(jpg|jpeg|png|webp|gif|svg|pjpeg)(\?[^&]*)?(&.*)?$'
+        # fmt= query param
+        r'|[?&]fmt=(jpg|jpeg|png|webp|gif|svg|pjpeg)'
+        # Scene7 / AEM image URLs
+        r'|/is/image/',
         re.I
     )
 
@@ -358,7 +367,7 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
 
 # ── Main scraping entry point ──────────────────────────────────────────────────
 
-def scrape(url: str, timeout: int = 15, scroll: bool = False, headless: bool = False) -> dict | None:
+def scrape(url: str, timeout: int = 15, scroll: bool = False, headless: bool = True) -> dict | None:
     """
     Scrape a single URL and return a dict with:
       - url, website_name
@@ -386,10 +395,10 @@ def scrape(url: str, timeout: int = 15, scroll: bool = False, headless: bool = F
             # Still try — partial content is better than nothing
             log.warning("Proceeding with partially loaded page.")
             # return None ?
-        
+
         if scroll:
             scroll_page(driver)
-        
+
         html = driver.page_source
 
     except WebDriverException as exc:
@@ -404,9 +413,9 @@ def scrape(url: str, timeout: int = 15, scroll: bool = False, headless: bool = F
         "url":          url,
         "website_name": website_name,
         "images":       extract_images(soup, url),
-        #"links":        extract_links(soup, url),
-        #"text":         extract_text(soup),
-        #"meta":         extract_metadata(soup),
+        # "links":        extract_links(soup, url),
+        # "text":         extract_text(soup),
+        # "meta":         extract_metadata(soup),
     }
 
 
@@ -448,13 +457,13 @@ if __name__ == "__main__":
             print(f"\n{'='*60}")
             print(f"  {data['website_name'].upper()}  —  {data['url']}")
             print(f"{'='*60}")
-            #print(f"Title     : {data['text']['title']}")
+            # print(f"Title     : {data['text']['title']}")
             print(f"Images    : {len(data['images'])}")
-            #print(f"Links     : {len(data['links'])}")
-            #print(f"Paragraphs: {len(data['text']['paragraphs'])}")
-            #print(f"Prices    : {data['text']['prices']}")
-            #print(f"Meta tags : {len(data['meta'])}")
-            #print(f"\nFull result (JSON):")
+            # print(f"Links     : {len(data['links'])}")
+            # print(f"Paragraphs: {len(data['text']['paragraphs'])}")
+            # print(f"Prices    : {data['text']['prices']}")
+            # print(f"Meta tags : {len(data['meta'])}")
+            # print(f"\nFull result (JSON):")
             print(json.dumps(data, indent=2, default=str))
         else:
             print("Scraping failed.")
