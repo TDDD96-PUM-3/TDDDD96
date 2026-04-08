@@ -7,7 +7,6 @@
 }
 
 .product-container {
-  border-color: aqua;
   margin-top: 30px;
   width: 600px;
   height: 440px;
@@ -21,11 +20,13 @@
   align-items: center;
   font-size: 20v;
   gap: 20px;
+  background-color: rgba(20, 39, 75, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .product-container img {
   width: 100%;
-  max-width: 300px;
+  max-width: 500px;
   height: 100%;
   max-height: 300px;
   object-fit: cover;
@@ -48,10 +49,10 @@
   padding: 16px;
 
   h1 {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
   }
 
   h2 {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
   }
 }
