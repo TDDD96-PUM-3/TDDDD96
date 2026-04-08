@@ -9,9 +9,17 @@ function LinearProgressWithLabel(props) {
     <Box sx={{ display: "flex", alignItems: "center" }}>
       <Box sx={{ width: "100%", mr: 1 }}>
         <LinearProgress
-          variant="determinate"
-          aria-label="Upload photos"
-          {...props}
+         variant="determinate"
+  aria-label="Upload photos"
+  {...props}
+  sx={{
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#eee",
+    "& .MuiLinearProgress-bar": {
+      backgroundColor: "#067a3c", // 👈 your color here
+    },
+  }}
         />
       </Box>
       <Box sx={{ minWidth: 35 }}>

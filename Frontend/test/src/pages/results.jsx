@@ -35,9 +35,10 @@ export default function Results() {
   ];
 
   return (
-    <div>
-      <h2 className="results-title">Results for: {query || "nothing"}</h2>
-      <div className="results-container">
+    <div className="results-container">
+      <h1 className="results-title">Results</h1>
+      <h6>Based on search: {query || "nothing"}</h6>
+      <div className="products">
         {fake_products
           .sort((a, b) => b.counterfeit - a.counterfeit)
           .map((product) => (

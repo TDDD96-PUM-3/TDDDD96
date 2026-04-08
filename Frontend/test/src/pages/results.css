@@ -1,4 +1,4 @@
-.results-container {
+.products {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 30px;
@@ -20,6 +20,7 @@
   justify-content: center;
   align-items: center;
   font-size: 20v;
+  gap: 20px;
 }
 
 .product-container img {
@@ -28,7 +29,8 @@
   height: 100%;
   max-height: 300px;
   object-fit: cover;
-  border-radius: 20px; /* crops nicely */
+  border-radius: 10px;
+  /* crops nicely */
 }
 
 .bajs {
@@ -40,4 +42,16 @@
 
 .bajs:hover {
   text-decoration: underline !important;
+}
+
+.results-container {
+  padding: 16px;
+
+  h1 {
+    font-family: 'Inter', sans-serif;
+  }
+
+  h2 {
+    font-family: 'Inter', sans-serif;
+  }
 }
