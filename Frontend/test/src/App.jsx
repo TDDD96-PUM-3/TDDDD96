@@ -1,34 +1,66 @@
-import { Routes, Route, Link } from "react-router-dom";
-
-function Home() {
-  return <h1>Home</h1>;
-}
-function Results() {
-  return <h1>Results page</h1>;
-}
-function Login() {
-  return <h1>Login page</h1>;
-}
-function Statistics() {
-  return <h1>Statistics page</h1>;
-}
+import { Routes, Route, NavLink, useLocation } from "react-router-dom";
+import Login from "./pages/login";
+import Search from "./pages/search";
+import Results from "./pages/results";
+import Statistics from "./pages/statistics";
+import "./App.css";
 
 export default function App() {
-  return (
-    <>
-      <nav style={{ display: "flex", gap: 12, padding: 12 }}>
-        <Link to="/">Home</Link>
-        <Link to="/Results">Results</Link>
-        <Link to="/Login">Login</Link>
-        <Link to="/Statistics">Statistics</Link>
-      </nav>
+  const location = useLocation();
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/Results" element={<Results />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/Statistics" element={<Statistics />} />
-      </Routes>
-    </>
+  const isLoginPage = location.pathname === "/";
+
+  return (
+    <div className="app">
+      {!isLoginPage && (
+        <nav className="topbar">
+          <h2 className="logo">CounterfeitDetector</h2>
+
+          <div className="topbar-links">
+            <NavLink
+              to="/search"
+              className={({ isActive }) =>
+                isActive ? "topbar-link active" : "topbar-link"
+              }
+            >
+              Search
+            </NavLink>
+            <NavLink
+              to="/results"
+              className={({ isActive }) =>
+                isActive ? "topbar-link active" : "topbar-link"
+              }
+            >
+              Results
+            </NavLink>
+            <NavLink
+              to="/statistics"
+              className={({ isActive }) =>
+                isActive ? "topbar-link active" : "topbar-link"
+              }
+            >
+              Statistics
+            </NavLink>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? "topbar-link active logout-link" : "topbar-link logout-link"
+              }
+            >
+              Logout
+            </NavLink>
+          </div>
+        </nav>
+      )}
+
+      <main className="page-content">
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/results" element={<Results />} />
+          <Route path="/statistics" element={<Statistics />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
