@@ -11,7 +11,7 @@ export default function Results() {
     {
       id: 1,
       name: "bitch",
-      link: "https://www.google.com/?client=safari",
+      link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
       picture:
         "https://cdn.starwebserver.se/shops/bengt-hastsport/files/cache/1266-spruta-2ml_grande.jpg?_=1740407786",
       counterfeit: 0.2,
@@ -19,7 +19,7 @@ export default function Results() {
     {
       id: 2,
       name: "bitch",
-      link: "https://www.google.com/?client=safari",
+      link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
       picture:
         "https://5.imimg.com/data5/SELLER/Default/2024/3/402757106/OY/YV/GN/7680765/sterile-latex-surgical-glove.jpg",
       counterfeit: 0.5,
@@ -27,7 +27,7 @@ export default function Results() {
     {
       id: 2,
       name: "bitch",
-      link: "https://www.google.com/?client=safari",
+      link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
       picture:
         "https://5.imimg.com/data5/SELLER/Default/2024/3/402757106/OY/YV/GN/7680765/sterile-latex-surgical-glove.jpg",
       counterfeit: 0.25,
