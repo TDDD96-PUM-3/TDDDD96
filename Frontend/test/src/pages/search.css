@@ -1,0 +1,25 @@
+.search-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 51vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 20px;
+}
+
+.search-icon-box {
+  background-color: #025f3a !important;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.search-icon-box svg {
+  color: white !important;
+}
+
+.search-icon-box:hover {
+  background-color: #067a3c !important;
+}

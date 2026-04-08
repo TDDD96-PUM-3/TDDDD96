@@ -1,8 +1,11 @@
-export default function Login() {
+//import { useNavigate } from "react-router-dom";
+import Login from "../components/LoginBox.jsx";
+import "./login.css";
+
+export default function Search() {
   return (
-    <div style={{ padding: 16 }}>
-      <h1>LOGIN</h1>
-      <p>BRUTHER.</p>
+    <div className="login-container">
+      <Login />
     </div>
   );
 }

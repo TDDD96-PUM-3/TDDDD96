@@ -1,0 +1,14 @@
+.login-btn {
+    background-color: #025f3a !important;
+    border-color: #025f3a !important;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.login-btn:hover {
+    background-color: #067a3c !important;
+    border-color: #067a3c !important;
+}
+
+.login-container {
+    margin-top: 5%;
+}
