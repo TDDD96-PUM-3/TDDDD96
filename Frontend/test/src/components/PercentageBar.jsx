@@ -15,7 +15,7 @@ function LinearProgressWithLabel(props) {
           sx={{
             height: 10,
             borderRadius: 5,
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "#ced7da",
             "& .MuiLinearProgress-bar": {
               backgroundColor: "#067a3c", // 👈 your color here
             },
@@ -41,7 +41,7 @@ LinearProgressWithLabel.propTypes = {
 
 export default function LinearWithValueLabel({ percentage }) {
   return (
-    <Box sx={{ width: "80%" }}>
+    <Box sx={{ width: "100%" }}>
       <LinearProgressWithLabel value={percentage} />
     </Box>
   );
