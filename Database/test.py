@@ -76,3 +76,18 @@ def test_login_logout(client):
     # Token should now be blacklisted
     rv = client.post('/user/logout', headers={'Authorization': f'Bearer {token}'})
     assert rv.status_code == 401
+
+
+def test_hash_and_salt():
+    # Ensure password hashes are unique even for same input
+    pw1 = bcrypt.generate_password_hash("Struts123")
+    pw2 = bcrypt.generate_password_hash("Struts123")
+    assert pw1 != pw2
+
+
+def test_multiple_tokens(client):
+    # Ensure different login sessions produce different tokens
+    client.post('/user', json={'username': 'Nisse', 'password': 'Struts123'})
+    token1 = client.post('/user/login', json={'username': 'Nisse', 'password': 'Struts123'}).get_json()['access_token']
+    token2 = client.post('/user/login', json={'username': 'Nisse', 'password': 'Struts123'}).get_json()['access_token']
+    assert token1 != token2
