@@ -25,7 +25,7 @@ export default function Results() {
       counterfeit: 0.5,
     },
     {
-      id: 2,
+      id: 5,
       name: "Filtrerande munskydd, PPE",
       link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
       picture:
@@ -38,7 +38,7 @@ export default function Results() {
       link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
       picture:
         "https://m.media-amazon.com/images/I/61yx+36SSbL._AC_UL480_FMwebp_QL65_.jpg",
-      counterfeit: 0,
+      counterfeit: 0.02,
     },
     {
       id: 4,
@@ -58,17 +58,16 @@ export default function Results() {
         {fake_products
           .sort((a, b) => b.counterfeit - a.counterfeit)
           .map((product) => (
-            <div className="product-container" key={product.id}>
-              <img src={product.picture} alt={product.name} />
-              <div className="bar-and-name">
-                <a href={product.link} className="product-link">
-                  {product.name}
-                </a>
-                <p><br></br>Counterfeit probability:</p>
-                <LinearWithValueLabel percentage={product.counterfeit * 100} />
-              </div>
-            </div>
-          ))}
+        <a className="product-container" key={product.id} href={product.link} target="_blank" rel="noopener noreferrer">
+          <img src={product.picture} alt={product.name} />
+          <div className="bar-and-name">
+            <div className="name"><h5 className="product-link">{product.name}</h5></div>
+            <div className="bar-text"><p>Counterfeit probability:</p></div>
+            <div className="bar"><LinearWithValueLabel percentage={product.counterfeit * 100} /></div>
+            
+          </div>
+        </a>
+        ))}
       </div>
     </div>
   );
