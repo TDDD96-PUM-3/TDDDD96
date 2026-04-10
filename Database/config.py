@@ -16,16 +16,17 @@ class ProductionConfig(Config):
     DEBUG = False
 
     @staticmethod
-    def get_db_uri():
+    def _build_db_uri():
         conn = os.environ.get('AZURE_POSTGRESQL_CONNECTIONSTRING', '')
         values = dict(x.split('=') for x in conn.split(' '))
-        user     = values['user']
-        host     = values['host']
-        database = values['dbname']
-        password = values['password']
-        return f'postgresql+psycopg2://{user}:{password}@{host}/{database}'
+        return (f"postgresql+psycopg2://{values['user']}:{values['password']}"
+                f"@{values['host']}/{values['dbname']}")
 
-    SQLALCHEMY_DATABASE_URI = get_db_uri.__func__()
+    # URI byggs inte förrän den faktiskt efterfrågas
+    SQLALCHEMY_DATABASE_URI = None
+
+    def __init__(self):
+        self.SQLALCHEMY_DATABASE_URI = self._build_db_uri()
 
 
 # Välj konfiguration baserat på miljövariabel

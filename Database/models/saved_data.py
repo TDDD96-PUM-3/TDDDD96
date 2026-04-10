@@ -6,11 +6,9 @@ class SavedData(db.Model):
     __tablename__ = 'saved_data'
 
     id         = db.Column(db.Integer, primary_key=True)
-    user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    title      = db.Column(db.String(200), nullable=False)
-    content    = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    link       = db.Column(db.String(200), nullable=False)
+    result     = db.Column(db.Float, nullable=False)
+    date       = db.Column(db.Date, nullable=False)
 
     # TODO: lägg till fler kolumner här efter behov, t.ex.:
     # category = db.Column(db.String(100))
@@ -18,10 +16,8 @@ class SavedData(db.Model):
 
     def to_dict(self):
         return {
-            'id':         self.id,
-            'user_id':    self.user_id,
-            'title':      self.title,
-            'content':    self.content,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat(),
+            'id':      self.id,
+            'link':    self.link,
+            'result':  self.result,
+            'date':    self.date,
         }
