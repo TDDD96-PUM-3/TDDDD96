@@ -1,16 +1,16 @@
 services:
   frontend:
-    build: ./Frontend
+    build: ./frontend
     ports:
       - "5173:5173"
     volumes:
-      - ./Frontend:/app
+      - ./frontend:/app
       - /app/node_modules
     networks:
       - app-network
 
   backend:
-    build: ./Backend
+    build: ./backend
     ports:
       - "8000:8000"
     shm_size: '2gb'
