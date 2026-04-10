@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "UniversalScraper.py"]
+CMD ["python", "universal_scraper.py"]
