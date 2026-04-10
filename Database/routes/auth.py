@@ -82,3 +82,6 @@ def logout():
         JWT_BLOCKLIST.add(jti)
 
     return jsonify({'message': 'Utloggning lyckades'}), 200
+
+
+def delete_user():
