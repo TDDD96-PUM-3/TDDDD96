@@ -424,6 +424,9 @@ def get_scraping_data(url: str) -> dict | None:
     Public interface — scrapes the URL and retries once with a
     longer timeout if the first attempt returns nothing.
     """
+    if not is_valid_url(url):
+        log.error("Invalid URL: %s", url)
+        return None
     result = scrape(url, timeout=15)
     if result is None:
         log.info("Retrying with extended timeout...")   # Funkar ej
