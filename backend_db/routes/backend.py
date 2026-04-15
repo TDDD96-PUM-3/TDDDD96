@@ -4,7 +4,7 @@ from universal_scraper import get_scraping_data, build_driver
 backend_bp = Blueprint('backend', __name__)
 
 
-@backend_bp.route('/scrape', methods=['GET'])
+@backend_bp.route('/scrape_url', methods=['GET'])
 def scrape_url():
     """ Endpoint to receive a URL from the frontend, scrape it, and return the data as JSON."""
     url = request.args.get('url', type=str)
