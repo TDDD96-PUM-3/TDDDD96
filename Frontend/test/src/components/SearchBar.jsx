@@ -13,7 +13,7 @@ export default function SearchBar({ onSearch }) {
   return (
     <Container className="mt-4">
       <Row className="justify-content-md-center">
-        <Col xs={12} md={6}>
+        <Col xs={12} md={7}>
           <Form onSubmit={handleSubmit}>
             <InputGroup>
               <Form.Control

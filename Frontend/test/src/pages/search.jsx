@@ -12,7 +12,7 @@ export default function Search() {
 
   return (
     <div className="search-container">
-      <h1>Search</h1>
+      <h1>Search.</h1>
 
       <SearchBar onSearch={handleSearch} />
 

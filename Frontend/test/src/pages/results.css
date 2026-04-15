@@ -54,6 +54,8 @@
 
   h1 {
     font-family: "Inter", sans-serif;
+    color: #00402f;
+    font-weight: 600;
   }
 
   h2 {
@@ -77,4 +79,17 @@
 .bar-text {
   position: absolute;
   bottom: 27px;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }

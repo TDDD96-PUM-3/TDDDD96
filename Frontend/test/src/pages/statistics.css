@@ -20,6 +20,7 @@
   border: 1px solid rgb(197, 197, 197);
   padding-top: 10px;
   border-radius: 20px;
+  transition: box-shadow 0.3s ease;
 
   /*ewwww*/
   h6 {
@@ -30,11 +31,17 @@
   gap: 10px;
 }
 
+.pie:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
 .statistics-container {
   padding: 16px;
 
   h1 {
     font-family: "Inter", sans-serif;
+    color: #00402f;
+    font-weight: 600;
   }
 
   h2 {

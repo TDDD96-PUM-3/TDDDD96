@@ -1,4 +1,5 @@
 import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import "./results.css";
 import LinearWithValueLabel from "../components/PercentageBar.jsx";
 
@@ -6,6 +7,8 @@ export default function Results() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const query = params.get("query");
+
+  const [sortType, setSortType] = useState("risk-high");
 
   const fake_products = [
     {
@@ -50,23 +53,66 @@ export default function Results() {
     },
   ];
 
+  const sortedProducts = [...fake_products].sort((a, b) => {
+    switch (sortType) {
+      case "risk-high":
+        return b.counterfeit - a.counterfeit;
+      case "risk-low":
+        return a.counterfeit - b.counterfeit;
+      case "name-az":
+        return a.name.localeCompare(b.name);
+      case "name-za":
+        return b.name.localeCompare(a.name);
+      default:
+        return 0;
+    }
+  });
+
   return (
     <div className="results-container">
       <h1 className="results-title">Results</h1>
+      <div className="results-header">
       <h6>Based on search: {query || "nothing"}</h6>
+
+      <div className="sort-controls">
+        <label htmlFor="sort">Sort by: </label>
+        <select
+          id="sort"
+          value={sortType}
+          onChange={(e) => setSortType(e.target.value)}
+        >
+          <option value="risk-high">Counterfeit risk: High to low</option>
+          <option value="risk-low">Counterfeit risk: Low to high</option>
+          <option value="name-az">Name: A to Z</option>
+          <option value="name-za">Name: Z to A</option>
+        </select>
+      </div>
+
+      </div>
+      
+
       <div className="products">
-        {fake_products
-          .sort((a, b) => b.counterfeit - a.counterfeit)
-          .map((product) => (
-        <a className="product-container" key={product.id} href={product.link} target="_blank" rel="noopener noreferrer">
-          <img src={product.picture} alt={product.name} />
-          <div className="bar-and-name">
-            <div className="name"><h5 className="product-link">{product.name}</h5></div>
-            <div className="bar-text"><p>Counterfeit probability:</p></div>
-            <div className="bar"><LinearWithValueLabel percentage={product.counterfeit * 100} /></div>
-            
-          </div>
-        </a>
+        {sortedProducts.map((product) => (
+          <a
+            className="product-container"
+            key={product.id}
+            href={product.link}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src={product.picture} alt={product.name} />
+            <div className="bar-and-name">
+              <div className="name">
+                <h5 className="product-link">{product.name}</h5>
+              </div>
+              <div className="bar-text">
+                <p>Counterfeit probability:</p>
+              </div>
+              <div className="bar">
+                <LinearWithValueLabel percentage={product.counterfeit * 100} />
+              </div>
+            </div>
+          </a>
         ))}
       </div>
     </div>
