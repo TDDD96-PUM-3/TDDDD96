@@ -5,8 +5,6 @@ A site-agnostic scraper built on Selenium + BeautifulSoup.
 No hardcoded site configs — everything is detected at runtime.
 """
 
-from itertools import product
-from collections import Counter
 import logging
 import re
 from time import sleep
@@ -20,6 +18,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 from itertools import chain
 
@@ -81,7 +80,7 @@ def build_driver(headless: bool = True) -> webdriver.Chrome:
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
 
-    service = Service("/usr/bin/chromedriver")
+    service = Service(ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=options)
 
 
@@ -194,66 +193,6 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
                     images.add(full)
 
     return [u for u in images if img_ext.search(u)]
-
-
-'''def extract_links(soup: BeautifulSoup, base_url: str) -> list[str]:
-    """Return all unique navigable absolute links on the page."""
-    links = set()
-    for tag in soup.find_all('a', href=True):
-        href = tag['href']
-        if is_navigable_href(href):
-            full = resolve_url(href, base_url)
-            if full:
-                links.add(full)
-    return list(links)'''
-
-
-'''def extract_text(soup: BeautifulSoup) -> dict:
-    """
-    Extract structured text without relying on site-specific selectors.
-    Heuristically identifies title, headings, paragraphs, and price-like strings.
-    """
-    # Remove clutter tags
-    for tag in soup(['script', 'style', 'nav', 'footer', 'header',
-                     'aside', 'form', 'noscript']):
-        tag.decompose()
-
-    title = soup.title.string.strip() if soup.title and soup.title.string else ""
-
-    headings = []
-    for level in ('h1', 'h2', 'h3'):
-        for tag in soup.find_all(level):
-            text = tag.get_text(strip=True)
-            if text:
-                headings.append({"level": level, "text": text})
-
-    paragraphs = [
-        p.get_text(strip=True)
-        for p in soup.find_all('p')
-        if len(p.get_text(strip=True)) > 40   # skip tiny/empty paragraphs
-    ]
-
-    # Generic price detection — finds patterns like $9.99, €12, £5.50
-    price_pattern = re.compile(r'[\$€£¥₹]\s?\d+[\.,]?\d*')
-    prices = list(set(price_pattern.findall(soup.get_text())))
-
-    return {
-        "title": title,
-        "headings": headings,
-        "paragraphs": paragraphs,
-        "prices": prices,
-    }'''
-
-
-'''def extract_metadata(soup: BeautifulSoup) -> dict:
-    """Pull Open Graph, Twitter Card, and standard meta tags."""
-    meta = {}
-    for tag in soup.find_all('meta'):
-        name  = tag.get('property') or tag.get('name') or tag.get('itemprop')
-        value = tag.get('content')
-        if name and value:
-            meta[name] = value.strip()
-    return meta'''
 
 
 # ── Main scraping entry point ──────────────────────────────────────────────────
