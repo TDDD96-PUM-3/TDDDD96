@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from universal_scraper import get_scraping_data
+from universal_scraper import get_scraping_data, build_driver
 
 backend_bp = Blueprint('backend', __name__)
 
@@ -10,8 +10,8 @@ def scrape_url():
     url = request.args.get('url', type=str)
     if not url:
         return jsonify({'error': 'Missing query parameter: url'}), 400
-
-    data = get_scraping_data(url)
+    driver = build_driver()
+    data = get_scraping_data(url, driver)
     if data is None:
         return jsonify({'error': 'Failed to scrape the URL'}), 400
     return jsonify(data), 200
