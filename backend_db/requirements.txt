@@ -4,6 +4,7 @@ flask-jwt-extended
 flask-bcrypt
 psycopg2-binary
 python-dotenv
+pytest
 beautifulsoup4>=4.12.0
 selenium>=4.20.0
 webdriver-manager>=4.0.0
