@@ -9,15 +9,13 @@ services:
     networks:
       - app-network
 
-  backend:
-    build: ./backend
+  backend_db:
+    build: ./backend_db
     ports:
       - "8000:8000"
     shm_size: '2gb'
     networks:
       - app-network
-
-#  Add database as service
 
 networks:
   app-network:
