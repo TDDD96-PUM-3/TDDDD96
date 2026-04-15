@@ -85,3 +85,4 @@ def logout():
 
 
 def delete_user():
+    pass

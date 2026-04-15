@@ -1,7 +1,7 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from config import config
 from extensions import db, jwt, bcrypt
-from routes import auth_bp, data_bp
+from routes import auth_bp, data_bp, backend_bp
 import os
 
 
@@ -21,6 +21,7 @@ def create_app(env=None):
     # Registrera blueprints (routes)
     app.register_blueprint(auth_bp)
     app.register_blueprint(data_bp)
+    app.register_blueprint(backend_bp)
 
     # Skapa tabeller om de inte finns
     with app.app_context():

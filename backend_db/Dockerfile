@@ -9,4 +9,5 @@ COPY . .
 
 ENV FLASK_ENV=development
 
-CMD ["flask", "--app", "app:create_app", "run", "--debug", "--host=0.0.0.0", "--port=8000"]
+CMD ["flask", "--app", "app:create_app", "run", "--debug", \
+    "--host=0.0.0.0", "--port=8000"]
