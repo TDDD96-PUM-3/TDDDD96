@@ -72,24 +72,21 @@ export default function Results() {
     <div className="results-container">
       <h1 className="results-title">Results</h1>
       <div className="results-header">
-      <h6>Based on search: {query || "nothing"}</h6>
-
-      <div className="sort-controls">
-        <label htmlFor="sort">Sort by: </label>
-        <select
-          id="sort"
-          value={sortType}
-          onChange={(e) => setSortType(e.target.value)}
-        >
-          <option value="risk-high">Counterfeit risk: High to low</option>
-          <option value="risk-low">Counterfeit risk: Low to high</option>
-          <option value="name-az">Name: A to Z</option>
-          <option value="name-za">Name: Z to A</option>
-        </select>
+        <h6>Based on search: {query || "nothing"}</h6>
+        <div className="sort-controls">
+          <label htmlFor="sort">Sort by: </label>
+          <select
+            id="sort"
+            value={sortType}
+            onChange={(e) => setSortType(e.target.value)}
+          >
+            <option value="risk-high">Counterfeit risk: High to low </option>
+            <option value="risk-low">Counterfeit risk: Low to high</option>
+            <option value="name-az">Name: A to Z</option>
+            <option value="name-za">Name: Z to A</option>
+          </select>
+        </div>
       </div>
-
-      </div>
-      
 
       <div className="products">
         {sortedProducts.map((product) => (
