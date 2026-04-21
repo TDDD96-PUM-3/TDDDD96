@@ -21,12 +21,15 @@ export default function SearchBar({ onSearch }) {
                 placeholder="Enter URL..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                style={{
+                  borderRadius: "20px 0 0 20px",
+                }}
               />
               <InputGroup.Text
                 className="search-icon-box"
                 onClick={() => onSearch(query)}
               >
-                <FiSearch className="search-icon"/>
+                <FiSearch className="search-icon" />
               </InputGroup.Text>
             </InputGroup>
           </Form>
