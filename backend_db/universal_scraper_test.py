@@ -25,7 +25,7 @@ def test_universal_scraper():
             # Print a readable summary
             print(f"\n{'='*60}")
             print(f"{'='*60}")
-            print(f"Images    : {len(data['images'])}")
+            print(f"Images    : {len(data.get('images', []))}")
             print(json.dumps(data, indent=2, default=str))
         else:
             print("Scraping failed.")
@@ -43,12 +43,11 @@ def test_scrape_url_endpoint():
         print(f"Status Code: {response.status_code}")
         if response.status_code == 200:
             data = response.get_json()
-            print(f"Images    : {len(data['images'])}")
             print(json.dumps(data, indent=2, default=str))
         else:
             print(f"Error: {response.get_json()}")
 
 
 if __name__ == "__main__":
-    # test_universal_scraper()
-    test_scrape_url_endpoint()
+    test_universal_scraper()
+    # test_scrape_url_endpoint()

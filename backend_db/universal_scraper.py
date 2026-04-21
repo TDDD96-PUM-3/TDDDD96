@@ -59,6 +59,11 @@ def resolve_url(href: str, base_url: str) -> str | None:
     return full if is_valid_url(full) else None
 
 
+def get_website_name(url: str) -> str:
+    netloc = urlparse(url).netloc.lower().replace("www.", "")
+    return netloc.split(".")[0]
+
+
 # ── Browser setup ──────────────────────────────────────────────────────────────
 
 
@@ -165,7 +170,7 @@ def scrape(url: str, driver: webdriver.Chrome, timeout: int = 15, headless: bool
             # Still try — partial content is better than nothing
             log.warning("Proceeding with partially loaded page.")
             # return None ?
-
+        website_name = get_website_name(url)
         html = driver.page_source
 
     except WebDriverException as exc:
@@ -176,7 +181,8 @@ def scrape(url: str, driver: webdriver.Chrome, timeout: int = 15, headless: bool
 
     return {
         "url":          url,
-        "images":       extract_images(soup, url),
+        'name':         website_name,
+        "images":       extract_images(soup, url)
     }
 
 
