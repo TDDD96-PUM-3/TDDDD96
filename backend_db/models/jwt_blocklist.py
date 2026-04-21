@@ -1,17 +1,21 @@
+from datetime import datetime, timezone
 from extensions import db
 
 
 class JWTBlocklist(db.Model):
     """
-    Store revoked JWT tokens.
+    Lagrar återkallade JWT-tokens (utloggade / spärrade).
 
     Attributes:
-        id: Primary key
-        jti: JWT token identifier
+        id:          Primärnyckel
+        jti:         Unik JWT-identifierare (från tokenens payload)
+        revoked_at:  När tokenet spärrades
     """
-    id = db.Column(db.Integer, primary_key=True)
-    jti = db.Column(db.String, nullable=False)  # JWT token identifier
+    __tablename__ = 'jwt_blocklist'
+
+    id         = db.Column(db.Integer, primary_key=True)
+    jti        = db.Column(db.String(36), nullable=False, unique=True, index=True)
+    revoked_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
-        """Return string representation for debugging."""
         return f'<JWTBlocklist jti={self.jti}>'

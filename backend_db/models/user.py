@@ -1,5 +1,10 @@
 from extensions import db, bcrypt
-from datetime import datetime
+from datetime import datetime, timezone
+
+
+def _utcnow():
+    """ Tidszon-medveten UTC-tid. Ersätter den deprecerade datetime.utcnow. """
+    return datetime.now(timezone.utc)
 
 
 class User(db.Model):
@@ -8,7 +13,7 @@ class User(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
     username   = db.Column(db.String(80), unique=True, nullable=False)
     password   = db.Column(db.String(200), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=_utcnow)
 
     def __init__(self, username, password):
         self.username = username
@@ -21,6 +26,6 @@ class User(db.Model):
         return {
             'id':         self.id,
             'username':   self.username,
-            'created_at': self.created_at.isoformat(),
+            'created_at': self.created_at.isoformat() if self.created_at else None,
             # TODO: lägg till fält här om ni vill exponera mer info
         }
