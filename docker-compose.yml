@@ -17,6 +17,14 @@ services:
     networks:
       - app-network
 
+  copycat_api:
+    build: ./copycat_api_tddd96
+    ports:
+      - "3100:3100"
+    shm_size: '2gb'
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
