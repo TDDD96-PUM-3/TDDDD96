@@ -2,12 +2,9 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 from datetime import timedelta
 from extensions import db
-from models import User
+from models import User, JWTBlocklist
 
 auth_bp = Blueprint('auth', __name__)
-
-
-JWT_BLOCKLIST = set()
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -72,14 +69,15 @@ def login():
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
-    """ Logga ut och invalidera token """
-    jwt_data = get_jwt()
-    jti = jwt_data.get('jti')
+    """ Logga ut och spärra token genom att lägga jti i blocklist-tabellen. """
+    jti = get_jwt().get('jti')
 
-    # Lägg token-id i blocklist så att den kan spärras.
-    # Detta är en enkel lösning som håller sig inom befintlig struktur.
     if jti:
-        JWT_BLOCKLIST.add(jti)
+        # Undvik dubbletter om samma token loggas ut två gånger
+        already_revoked = JWTBlocklist.query.filter_by(jti=jti).first()
+        if not already_revoked:
+            db.session.add(JWTBlocklist(jti=jti))
+            db.session.commit()
 
     return jsonify({'message': 'Utloggning lyckades'}), 200
 

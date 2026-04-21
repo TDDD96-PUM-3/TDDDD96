@@ -1,5 +1,4 @@
 from extensions import db
-from datetime import datetime
 
 
 class SavedData(db.Model):
@@ -19,5 +18,5 @@ class SavedData(db.Model):
             'id':      self.id,
             'link':    self.link,
             'result':  self.result,
-            'date':    self.date,
+            'date':    self.date.isoformat() if self.date else None,
         }

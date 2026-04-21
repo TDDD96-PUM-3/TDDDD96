@@ -3,18 +3,13 @@ from extensions import jwt
 from flask import jsonify
 
 
+@jwt.token_in_blocklist_loader
 def check_if_token_is_revoked(jwt_header, jwt_payload):
     """
-    Check if a JWT token is revoked.
-
-    Args:
-        jwt_header: JWT header (ignored)
-        jwt_payload: JWT payload
-
-    Returns:
-        True if token is in blocklist, False otherwise
+    Anropas automatiskt av flask-jwt-extended för varje skyddad request.
+    Returnerar True om tokenets jti finns i blocklist-tabellen.
     """
-    jti = jwt_payload['jti']  # Unique JWT identifier
+    jti = jwt_payload['jti']  # Unik JWT-identifierare
     return JWTBlocklist.query.filter_by(jti=jti).first() is not None
 
 

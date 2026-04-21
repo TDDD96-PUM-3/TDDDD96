@@ -18,6 +18,10 @@ def create_app(env=None):
     jwt.init_app(app)
     bcrypt.init_app(app)
 
+    # Importera JWT-callbacks så att de registreras på jwt-managern.
+    # (Dekoratorerna körs först när modulen importeras.)
+    from utils import token_check  # noqa: F401
+
     # Registrera blueprints (routes)
     app.register_blueprint(auth_bp)
     app.register_blueprint(data_bp)
