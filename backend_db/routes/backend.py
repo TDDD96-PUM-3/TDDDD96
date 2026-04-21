@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request
 from universal_scraper import get_scraping_data, build_driver
-from backend_to_db import compose_result, send_to_db
-from mock_ai_api import get_result
+from backend_to_db import compose_result, send_to_db, get_copycat_result
 from flask_jwt_extended import jwt_required
 
 
@@ -19,7 +18,12 @@ def scrape_url():
     data = get_scraping_data(url, driver)
     if data is None:
         return jsonify({'error': 'Failed to scrape the URL'}), 400
-    api_prob = get_result(data['images'])
+    if not data.get('images'):
+        return jsonify({'error': 'No images found on the target page'}), 400
+    try:
+        api_prob = get_copycat_result(data['images'])
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 500
     result = compose_result(url, api_prob, data['name'])
     send_to_db(result)
     return jsonify(result), 200
