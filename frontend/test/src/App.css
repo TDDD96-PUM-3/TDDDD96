@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: 30px 24px;
+  background-color: #00402f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  margin: 0;
+  margin-right: auto;
+  margin-left: 5%;
+  color: #009c14;
+  font-size: 2rem;
+  font-family: 'Myriad Pro', sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+.topbar-links {
+  display: flex;
+  gap: 55px;
+  padding-right: 5%;
+}
+
+.topbar-link {
+  color: white;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  font-size: large;
+  padding: 8px 14px;
+  /*border-radius: var(--bs-border-radius);*/
+  /*transition: background-color 0.2s ease, color 0.2s ease;*/
+}
+
+.topbar-link:hover {
+  /*color: white;*/
+  /*background-color: #374151;*/
+  text-decoration: underline;
+}
+
+.topbar-link.active {
+  color: #97ff6f;
+  /*background-color: #067a3c;*/
+}
+
+.logout-link {
+  border-radius: var(--bs-border-radius);
+  background-color: #025f3a;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.logout-link:hover {
+  background-color: #067a3c !important;
+
+}
+
+
+.page-content {
+  max-width: 1200px;
+  margin: auto;
+  margin-top: 20px;
+  /*padding: 40px 20px;*/
+}

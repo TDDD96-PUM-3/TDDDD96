@@ -1,0 +1,21 @@
+import { useNavigate } from "react-router-dom";
+import SearchBar from "../components/SearchBar";
+import "./search.css";
+
+export default function Search() {
+  const navigate = useNavigate();
+
+  const handleSearch = (query) => {
+    navigate(`/results?query=${query}`);
+    // navigate(`/statistics?query=${query}`);
+  };
+
+  return (
+    <div className="search-container">
+      <h1>Search.</h1>
+
+      <SearchBar onSearch={handleSearch} />
+
+    </div>
+  );
+}

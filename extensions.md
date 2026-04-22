@@ -4,7 +4,6 @@ Practical extension recommendations and setup steps for:
 
 - Python
 - React (JavaScript/TypeScript)
-- Elasticsearch
 
 ---
 
@@ -29,20 +28,6 @@ Open Extensions in VS Code (`Ctrl+Shift+X`) and search for these IDs:
   - Linting support
 - `esbenp.prettier-vscode` (Prettier - Code formatter)
   - Automatic formatting for JS and TS
-
-### Elasticsearch
-
-- `ria.elastic` (Elasticsearch for VSCode)
-  - Query Elasticsearch directly
-  - Syntax highlighting
-- `humao.rest-client` (REST Client)
-  - Send HTTP queries
-
-Example REST Client request:
-
-```http
-GET https://example.com/comments/1 HTTP/1.1
-```
 
 ---
 

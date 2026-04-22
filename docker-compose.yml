@@ -1,0 +1,22 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - app-network
+
+  backend_db:
+    build: ./backend_db
+    ports:
+      - "8000:8000"
+    shm_size: '2gb'
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
