@@ -1,5 +1,5 @@
 import json
-from universal_scraper import get_scraping_data, build_driver
+from universal_scraper import get_scraping_data, build_driver, image_extension_regex
 
 TEST_URLS = [
     "https://www.amazon.com/Bordered-Silicone-Dressing-Waterproof-Breathable/dp/B08BWGVGTP/ref=sr_1_1_sspa?dib=eyJ2IjoiMSJ9.ZV02BNtZXQoBrqQQIy9y-SnmgOmsmvyGQLIc9ZByv9arLpVWq_HFnmLqMaR1Byh-HJRqWCg867DH7PjNGbSR0hmZ2lBLLgGPqGj-QoyF_xTjJmyYb7gcGQ-BebuYS-fgCsreiKdeohhTr6I2SFC0jfgZ1p1rO9ChKjt3QeuIjKIaSBS_NGZ-4hH2S4yOrZwYVpHFrM9mDOQV6bQM6AcjhHQNdpCYA8XhywCPwQhAUZQ.2PRPBRdM7jFg47JBiUcDXpWP7ZSAhGrNSccrwWuXH_s&dib_tag=se&keywords=m%C3%B6lnlycke&qid=1772530320&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1",
@@ -10,16 +10,18 @@ TEST_URLS = [
     "https://www.walmart.com/ip/KONG-Dr-Noys-Plush-Frog-Squeaker-Dog-Toy/19629165?athAsset=eyJhdGhjcGlkIjoiMTk2MjkxNjUiLCJhdGhzdGlkIjoiQ1MwMjAiLCJhdGhhbmNpZCI6Ikl0ZW1DYXJvdXNlbCIsImF0aHJrIjowLjB9&athena=true",
     "https://www.facebook.com/marketplace/item/5511004022338405/",
     "https://www.target.com/p/what-do-you-meme-emotional-support-minis-chocolate-bunnies-stuffed-animal/-/A-94961278#lnk=sametab",
-    "https://www.blocket.se/mobility/item/21419403",
+    "https://www.blocket.se/mobility/item/22535662",
     "https://www.elgiganten.se/product/vitvaror/tvatt-tork/tvattmaskin/electrolux-serie-600-tvattmaskin-efi622ex4e105kg/966285",
 ]
 
 
 def test_universal_scraper():
-
+    # dependencies 
     driver = build_driver()
+    img_ext = image_extension_regex()
+    
     for url in TEST_URLS:
-        data = get_scraping_data(url, driver)
+        data = get_scraping_data(url, driver, img_ext)
 
         if data:
             # Print a readable summary
