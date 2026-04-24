@@ -38,3 +38,21 @@
 .search-icon-box:hover {
   background-color: #067a3c !important;
 }
+
+.search-input:focus,
+.search-input:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: #ced4da !important;
+}
+
+.search-icon-box:focus,
+.search-icon-box:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.input-group:focus-within {
+  box-shadow: none !important;
+  outline: none !important;
+}
