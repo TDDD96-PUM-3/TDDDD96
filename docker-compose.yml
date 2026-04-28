@@ -13,6 +13,8 @@ services:
     build: ./backend_db
     ports:
       - "8000:8000"
+    environment:
+      COPYCAT_API_CHECK_URL: http://copycat_api:3100/check
     shm_size: '2gb'
     networks:
       - app-network

@@ -6,9 +6,9 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 import requests
 
-MAX_IMAGE_BYTES = 10 * 1024 * 1024  # 10 MB
+MAX_IMAGE_BYTES = 10 * 1024 * 1024
 COPYCAT_API_CHECK_URL = os.getenv(
-    'COPYCAT_API_CHECK_URL', 'http://copycat_api:3100/check')
+    'COPYCAT_API_CHECK_URL', 'http://localhost:3100/check')
 
 
 def compose_result(url, result, websitename):
