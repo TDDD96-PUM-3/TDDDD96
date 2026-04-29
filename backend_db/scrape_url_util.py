@@ -32,9 +32,9 @@ def get_copycat_result(image_urls):
     """
     if not image_urls:
         raise ValueError('No image URLs provided for model inference.')
-
     last_error = None
-    successful_calls = 0
+    counterfeit_count = 0
+
     for image_url in image_urls:
         try:
             filename, file_obj, content_type = img_url_to_file(image_url)
@@ -44,18 +44,17 @@ def get_copycat_result(image_urls):
                 timeout=30,
             )
             response.raise_for_status()
-            successful_calls += 1
             prediction = response.json().get('prediction', 'OK')
-            if prediction != 'OK':
-                return prediction
-        except Exception as exc:
+            if 'copyright_infringement_of_' in prediction:
+                counterfeit_count += 1
+        except (ValueError, requests.RequestException) as exc:
             last_error = exc
             continue
 
-    if last_error and successful_calls == 0:
+    if last_error and counterfeit_count == 0:
         raise ValueError(
             f'Failed to run model inference: {last_error}') from last_error
-    return 'OK'
+    return counterfeit_count
 
 
 def img_url_to_file(url, max_bytes=MAX_IMAGE_BYTES):
