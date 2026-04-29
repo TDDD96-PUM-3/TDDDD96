@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from backend_db.scrape_url_util import get_copycat_result
+from scrape_url_util import get_copycat_result
 from universal_scraper import get_scraping_data, build_driver
 
 TEST_URLS = [
