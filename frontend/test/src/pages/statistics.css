@@ -47,4 +47,8 @@
   h2 {
     font-family: "Inter", sans-serif;
   }
+  h6 {
+    padding-top: 3px;
+    width: 60%;
+  }
 }

@@ -30,7 +30,6 @@
   height: 60%;
   object-fit: cover;
   display: block;
-
 }
 
 .product-link {
@@ -61,6 +60,9 @@
   h2 {
     font-family: "Inter", sans-serif;
   }
+  h6 {
+    width: 60%;
+  }
 }
 
 .bar-and-name {
@@ -84,7 +86,54 @@
 .sort-controls {
   display: flex;
   align-items: center;
+  position: relative;
   gap: 0.5rem;
+
+  background: #ffffff;
+  /* padding: 6px 12px; */
+  border-radius: 999px; /* pill-shape som känns modern */
+  /*border: 1px solid rgb(197, 197, 197);*/
+  transition: box-shadow 0.2s ease;
+}
+
+.sort-controls select {
+  border-radius: 16px;
+  padding: 5px;
+  background: transparent;
+  /* font-family: "Inter", sans-serif; */
+  font-size: 0.9rem;
+  color: #00402f;
+  font-weight: 700;
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  padding-right: 10px;
+  padding-left: 10px;
+  /* padding-top: 5px; */
+  /* border: 10px; */
+  transition: box-shadow 0.2s ease;
+}
+
+.sort-controls select:focus {
+  outline: none;
+}
+
+.sort-controls::after {
+  /* content: "▾"; */
+  position: absolute;
+  right: 10px;
+  pointer-events: pointer;
+  color: #00402f;
+  font-size: 1.5rem;
+  /* padding-left: 5px; */
+  /* padding-right: 13px; */
+}
+
+.sort-controls select:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
 .results-header {
