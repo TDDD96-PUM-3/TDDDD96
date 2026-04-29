@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from universal_scraper import get_scraping_data, build_driver
-from backend_db.scrape_url_util import compose_result, send_to_db, get_copycat_result
+from scrape_url_util import compose_result, send_to_db, get_copycat_result
 from flask_jwt_extended import jwt_required
 
 
@@ -25,5 +25,8 @@ def scrape_url():
     except ValueError as exc:
         return jsonify({'error': str(exc)}), 500
     result = compose_result(url, api_prob, data['name'])
+    print(f'---------------------------------------------------')
+    print(f"Composed result: {result}")
+
     send_to_db(result)
     return jsonify(result), 200

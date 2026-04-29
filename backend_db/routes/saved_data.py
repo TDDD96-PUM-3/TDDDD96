@@ -22,7 +22,8 @@ def _parse_date(value):
 def create_entry():
     """ Skapa en ny datapost (link, result, date). Inga relationer. """
     data = request.get_json() or {}
-    link = data.get('link')
+    webname = data.get('webname')
+    link = data.get('url')
     result = data.get('result')
     date_value = data.get('date')
 
@@ -43,7 +44,8 @@ def create_entry():
     if parsed_date is None:
         parsed_date = date_cls.today()
 
-    entry = SavedData(link=link, result=result, date=parsed_date)
+    entry = SavedData(webname=webname, link=link,
+                      result=result, date=parsed_date)
     db.session.add(entry)
     db.session.commit()
 
@@ -78,8 +80,12 @@ def update_entry(entry_id):
 
     data = request.get_json() or {}
 
+    if 'webname' in data:
+        if not data['webname']:
+            return jsonify({'message': 'webname får inte vara tomt'}), 400
+        entry.webname = data['webname']
     if 'link' in data:
-        if not data['link']:
+        if not data['url']:
             return jsonify({'message': 'link får inte vara tomt'}), 400
         entry.link = data['link']
 

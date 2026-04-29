@@ -9,6 +9,7 @@ import requests
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
 COPYCAT_API_CHECK_URL = os.getenv(
     'COPYCAT_API_CHECK_URL', 'http://localhost:3100/check')
+FLASK_API_URL = os.getenv('FLASK_API_URL', 'http://localhost:8000')
 
 
 def compose_result(url, result, websitename):
@@ -17,23 +18,35 @@ def compose_result(url, result, websitename):
         'name': websitename,
         'link': url,
         'counterfeit': result,
-        'date': datetime.now().date()
+        'date': datetime.now().date().isoformat()
     }
 
 
 def send_to_db(result):
-    pass
+    """ Helper function to save the result to the database."""
+
+    payload = {
+        'webname': result.get('name'),
+        'url': result.get('link'),
+        'result': result.get('counterfeit'),
+        'date': result.get('date')
+    }
+    response = requests.post(f'{FLASK_API_URL}/data', json=payload, timeout=10)
+    print(f'Database save response: {response.status_code} - {response.text}')
+    if response.status_code not in (200):
+        raise ValueError(
+            f'Failed to save result to database: {response.text}')
 
 
 def get_copycat_result(image_urls):
-    """Send scraped image URLs to Copycat API and return the first positive match.
-
-    If no positive match is found, returns 'OK'.
+    """Send scraped image URLs to Copycat API and return amount of counterfeit images detected
+    on a website url. Has some error handling.
     """
     if not image_urls:
         raise ValueError('No image URLs provided for model inference.')
     last_error = None
     counterfeit_count = 0
+    successful_calls = 0
 
     for image_url in image_urls:
         try:
@@ -45,13 +58,14 @@ def get_copycat_result(image_urls):
             )
             response.raise_for_status()
             prediction = response.json().get('prediction', 'OK')
+            successful_calls += 1
             if 'copyright_infringement_of_' in prediction:
                 counterfeit_count += 1
         except (ValueError, requests.RequestException) as exc:
             last_error = exc
             continue
 
-    if last_error and counterfeit_count == 0:
+    if last_error and successful_calls == 0:
         raise ValueError(
             f'Failed to run model inference: {last_error}') from last_error
     return counterfeit_count
@@ -61,7 +75,6 @@ def img_url_to_file(url, max_bytes=MAX_IMAGE_BYTES):
     """Download an image URL and return it as an in-memory file object.
     Returns a tuple: (filename, file_obj, content_type).
     The file_obj is a BytesIO instance ready for multipart uploads.
-
     Raises ValueError if the URL is invalid, doesn't point to an image,
     the image is empty, or exceeds max_bytes.
     """
