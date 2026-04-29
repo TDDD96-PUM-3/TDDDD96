@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from backend_to_db import get_copycat_result
+from backend_db.scrape_url_util import get_copycat_result
 from universal_scraper import get_scraping_data, build_driver
 
 TEST_URLS = [
@@ -17,7 +17,7 @@ TEST_URLS = [
 
 
 def test_check_image():
-    """ Test ai_api chceck route, requires a running app"""
+    """ Simple test for ai_api chceck route, requires a running app"""
     driver = build_driver()
     for url in TEST_URLS:
         data = get_scraping_data(url, driver)

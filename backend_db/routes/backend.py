@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from universal_scraper import get_scraping_data, build_driver
-from backend_to_db import compose_result, send_to_db, get_copycat_result
+from backend_db.scrape_url_util import compose_result, send_to_db, get_copycat_result
 from flask_jwt_extended import jwt_required
 
 
