@@ -64,6 +64,20 @@ def get_website_name(url: str) -> str:
     return netloc.split(".")[0]
 
 
+def image_extension_regex() -> re.Pattern:
+    # Match common image extensions in URLs (e.g. ?fmt=jpg)
+    img_ext = re.compile(
+        # extension anywhere before params
+        r'\.(jpg|jpeg|png|webp|gif|pjpeg)(\?[^&]*)?(&.*)?$'
+        # fmt= query param
+        r'|[?&]fmt=(jpg|jpeg|png|webp|gif|pjpeg)'
+        # Scene7 / AEM image URLs
+        r'|/is/image/',
+        re.I
+    )
+    return img_ext
+
+
 # ── Browser setup ──────────────────────────────────────────────────────────────
 
 
@@ -119,18 +133,12 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
       - <img src> and <img data-src> (lazy loading)
       - <source srcset> inside <picture>
       - any src-like attribute containing an image extension
+    URLs with query parameters are excluded.
     """
     images = set()
-    # Match common image extensions in URLs (e.g. ?fmt=jpg)
-    img_ext = re.compile(
-        # extension anywhere before params
-        r'\.(jpg|jpeg|png|webp|gif|svg|pjpeg)(\?[^&]*)?(&.*)?$'
-        # fmt= query param
-        r'|[?&]fmt=(jpg|jpeg|png|webp|gif|svg|pjpeg)'
-        # Scene7 / AEM image URLs
-        r'|/is/image/',
-        re.I
-    )
+
+    # Match common image extensions in URLs
+    img_ext = image_extension_regex()
 
     for tag in soup.find_all('img'):
         for attr in ('src', 'data-src', 'data-lazy-src', 'data-original'):
@@ -149,7 +157,14 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
                 if full:
                     images.add(full)
 
-    return [u for u in images if img_ext.search(u)]
+    # Filter: keep only URLs with image extension in path, and exclude any with query params
+    result = []
+    for u in images:
+        parsed = urlparse(u)
+        if img_ext.search(parsed.path) and not parsed.query:
+            result.append(u)
+
+    return result
 
 
 def scrape(url: str, driver: webdriver.Chrome, timeout: int = 15, headless: bool = True) -> dict | None:
