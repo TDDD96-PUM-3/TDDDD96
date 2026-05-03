@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from config import config
 from extensions import db, jwt, bcrypt
 from routes import auth_bp, data_bp, backend_bp
@@ -8,6 +9,7 @@ import os
 def create_app(env=None):
     """ Application factory – skapar och konfigurerar Flask-appen """
     app = Flask(__name__)
+    CORS(app)
 
     # Ladda konfiguration
     env = env or os.getenv('FLASK_ENV', 'default')

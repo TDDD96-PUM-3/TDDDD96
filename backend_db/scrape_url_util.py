@@ -11,11 +11,14 @@ COPYCAT_API_CHECK_URL = os.getenv(
     'COPYCAT_API_CHECK_URL', 'http://localhost:3100/check')
 
 
-def compose_result(url, result, websitename):
+def compose_result(url, result, websitename, images=None):
     """ Helper function to compose the result dictionary for saving to the database."""
+    images = images or []
     return {
         'name': websitename,
         'link': url,
+        'picture': images[0] if images else None,
+        'images': images,
         'counterfeit': result,
         'date': datetime.now().date()
     }

@@ -29,6 +29,13 @@ export default function SearchBar({ onSearch }) {
               <InputGroup.Text
                 className="search-icon-box"
                 onClick={() => onSearch(query)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    onSearch(query);
+                  }
+                }}
               >
                 <FiSearch className="search-icon" />
               </InputGroup.Text>

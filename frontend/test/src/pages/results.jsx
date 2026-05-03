@@ -1,72 +1,119 @@
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
 import "./results.css";
 import LinearWithValueLabel from "../components/PercentageBar.jsx";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
+function getCounterfeitScore(value) {
+  if (typeof value === "number") {
+    return value > 1 ? value / 100 : value;
+  }
+
+  if (!value || value === "OK") {
+    return 0;
+  }
+
+  return 1;
+}
+
+function getCounterfeitLabel(value) {
+  if (!value || value === "OK") {
+    return "No infringement found";
+  }
+
+  return String(value).replaceAll("_", " ");
+}
+
+function normalizeUrl(url) {
+  const trimmedUrl = url.trim();
+
+  if (!trimmedUrl || /^https?:\/\//i.test(trimmedUrl)) {
+    return trimmedUrl;
+  }
+
+  return `https://${trimmedUrl}`;
+}
 
 export default function Results() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const query = params.get("query");
+  const query = normalizeUrl(params.get("query") || "");
 
   const [sortType, setSortType] = useState("risk-high");
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const fake_products = [
-    {
-      id: 1,
-      name: "EasyWarm+",
-      link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
-      picture:
-        "https://minervablob.blob.core.windows.net/resized-images-container/BARRIER%20Easywarm+-629910_124877_E-512x512.png?sv=2019-07-07&sr=b&sig=aEwfap14IHBPvQveasXLv8i5djcmaAEPIplIFMIfjOc%3D&se=2029-04-07T21%3A31%3A45Z&sp=r",
-      counterfeit: 0.2,
-    },
-    {
-      id: 2,
-      name: "Filtrerande munskydd, PPE",
-      link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
-      picture:
-        "https://minervablob.blob.core.windows.net/resized-images-container/Filtering%20Half%20Mask-42904,42902_104373_E-512x512.png?sv=2019-07-07&sr=b&sig=klj27vnnUfEIBY48%2FEcPCZYKJygomgTg7uTarw1UKLI%3D&se=2029-04-07T21%3A31%3A45Z&sp=r",
-      counterfeit: 0.5,
-    },
-    {
-      id: 5,
-      name: "Filtrerande munskydd, PPE",
-      link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
-      picture:
-        "https://minervablob.blob.core.windows.net/resized-images-container/Filtering%20Half%20Mask-42904,42902_104373_E-512x512.png?sv=2019-07-07&sr=b&sig=klj27vnnUfEIBY48%2FEcPCZYKJygomgTg7uTarw1UKLI%3D&se=2029-04-07T21%3A31%3A45Z&sp=r",
-      counterfeit: 0.25,
-    },
-    {
-      id: 3,
-      name: "4 Pack Mouth Cover Feboy Mask, Anime Mouth Cover Cotton Mask Funny Kawaii Cartoon Cotton Mask Reusable Cosplay Manga Mask For Men Women Kids School Outdoor Party",
-      link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
-      picture:
-        "https://m.media-amazon.com/images/I/61yx+36SSbL._AC_UL480_FMwebp_QL65_.jpg",
-      counterfeit: 0.02,
-    },
-    {
-      id: 4,
-      name: "Hjälmar",
-      link: "https://www.youtube.com/watch?v=oHg5SJYRHA0",
-      picture:
-        "https://minervablob.blob.core.windows.net/resized-images-container/Staff%20clothing%20in%20the%20OR%E2%80%93030_187258_E-512x512.png?sv=2019-07-07&sr=b&sig=jQ8u2k4wfq3mMZScb1Kx6q0yB9AbGiOWCQ2ac0magA0%3D&se=2029-04-07T21%3A31%3A45Z&sp=r",
-      counterfeit: 0.92,
-    },
-  ];
+  useEffect(() => {
+    const controller = new AbortController();
 
-  const sortedProducts = [...fake_products].sort((a, b) => {
-    switch (sortType) {
-      case "risk-high":
-        return b.counterfeit - a.counterfeit;
-      case "risk-low":
-        return a.counterfeit - b.counterfeit;
-      case "name-az":
-        return a.name.localeCompare(b.name);
-      case "name-za":
-        return b.name.localeCompare(a.name);
-      default:
-        return 0;
+    async function scrapeUrl() {
+      if (!query) {
+        setProducts([]);
+        setError("");
+        return;
+      }
+
+      setIsLoading(true);
+      setError("");
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/scrape_url?url=${encodeURIComponent(query)}`,
+          { signal: controller.signal }
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not scrape the URL.");
+        }
+
+        setProducts([
+          {
+            id: query,
+            name: data.name || query,
+            link: data.link || query,
+            picture: data.picture,
+            counterfeit: data.counterfeit,
+          },
+        ]);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setProducts([]);
+          setError(err.message || "Could not scrape the URL.");
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
     }
-  });
+
+    scrapeUrl();
+
+    return () => controller.abort();
+  }, [query]);
+
+  const sortedProducts = useMemo(() => {
+    return [...products].sort((a, b) => {
+      const aScore = getCounterfeitScore(a.counterfeit);
+      const bScore = getCounterfeitScore(b.counterfeit);
+
+      switch (sortType) {
+        case "risk-high":
+          return bScore - aScore;
+        case "risk-low":
+          return aScore - bScore;
+        case "name-az":
+          return a.name.localeCompare(b.name);
+        case "name-za":
+          return b.name.localeCompare(a.name);
+        default:
+          return 0;
+      }
+    });
+  }, [products, sortType]);
 
   return (
     <div className="results-container">
@@ -88,29 +135,43 @@ export default function Results() {
         </div>
       </div>
 
+      {isLoading && <p className="results-status">Scraping URL...</p>}
+      {error && <p className="results-status results-error">{error}</p>}
+      {!isLoading && !error && query && sortedProducts.length === 0 && (
+        <p className="results-status">No results found.</p>
+      )}
+
       <div className="products">
-        {sortedProducts.map((product) => (
-          <a
-            className="product-container"
-            key={product.id}
-            href={product.link}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src={product.picture} alt={product.name} />
-            <div className="bar-and-name">
-              <div className="name">
-                <h5 className="product-link">{product.name}</h5>
+        {sortedProducts.map((product) => {
+          const score = getCounterfeitScore(product.counterfeit);
+
+          return (
+            <a
+              className="product-container"
+              key={product.id}
+              href={product.link}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {product.picture ? (
+                <img src={product.picture} alt={product.name} />
+              ) : (
+                <div className="product-image-placeholder">No image</div>
+              )}
+              <div className="bar-and-name">
+                <div className="name">
+                  <h5 className="product-link">{product.name}</h5>
+                </div>
+                <div className="bar-text">
+                  <p>{getCounterfeitLabel(product.counterfeit)}</p>
+                </div>
+                <div className="bar">
+                  <LinearWithValueLabel percentage={score * 100} />
+                </div>
               </div>
-              <div className="bar-text">
-                <p>Counterfeit probability:</p>
-              </div>
-              <div className="bar">
-                <LinearWithValueLabel percentage={product.counterfeit * 100} />
-              </div>
-            </div>
-          </a>
-        ))}
+            </a>
+          );
+        })}
       </div>
     </div>
   );

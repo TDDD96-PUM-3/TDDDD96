@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 from universal_scraper import get_scraping_data, build_driver
-from backend_db.scrape_url_util import compose_result, send_to_db, get_copycat_result
+from scrape_url_util import compose_result, send_to_db, get_copycat_result
 from flask_jwt_extended import jwt_required
+from selenium.common.exceptions import WebDriverException
 
 
 backend_bp = Blueprint('backend', __name__)
@@ -14,8 +15,16 @@ def scrape_url():
     url = request.args.get('url', type=str)
     if not url:
         return jsonify({'error': 'Missing query parameter: url'}), 400
-    driver = build_driver()
-    data = get_scraping_data(url, driver)
+    try:
+        driver = build_driver()
+    except WebDriverException as exc:
+        return jsonify({'error': f'Failed to start browser for scraping: {exc}'}), 500
+
+    try:
+        data = get_scraping_data(url, driver)
+    finally:
+        driver.quit()
+
     if data is None:
         return jsonify({'error': 'Failed to scrape the URL'}), 400
     if not data.get('images'):
@@ -24,6 +33,6 @@ def scrape_url():
         api_prob = get_copycat_result(data['images'])
     except ValueError as exc:
         return jsonify({'error': str(exc)}), 500
-    result = compose_result(url, api_prob, data['name'])
+    result = compose_result(url, api_prob, data['name'], data.get('images', []))
     send_to_db(result)
     return jsonify(result), 200

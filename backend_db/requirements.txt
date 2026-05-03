@@ -1,4 +1,5 @@
 flask
+flask-cors
 flask-sqlalchemy
 flask-jwt-extended
 flask-bcrypt

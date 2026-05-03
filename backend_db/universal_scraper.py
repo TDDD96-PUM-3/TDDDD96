@@ -6,6 +6,7 @@ No hardcoded site configs — everything is detected at runtime.
 """
 
 import logging
+import shutil
 import re
 from urllib.parse import urljoin, urlparse
 
@@ -70,16 +71,23 @@ def get_website_name(url: str) -> str:
 def build_driver(headless: bool = True) -> webdriver.Chrome:
     options = Options()
     if headless:
-        options.add_argument("--headless")
+        options.add_argument("--headless=new")
         options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--remote-debugging-pipe")
+    options.add_argument("--window-size=1365,768")
     options.add_argument("--incognito")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
 
-    service = Service(ChromeDriverManager().install())
+    chromium_path = shutil.which("chromium") or shutil.which("google-chrome")
+    if chromium_path:
+        options.binary_location = chromium_path
+
+    chromedriver_path = shutil.which("chromedriver")
+    service = Service(chromedriver_path or ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=options)
 
 
