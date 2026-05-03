@@ -5,6 +5,8 @@ from datetime import datetime
 from urllib.parse import urlparse
 from urllib.request import urlopen, Request
 import requests
+from universal_scraper import get_scraping_data, build_driver
+from db_utils import save_result_to_db
 
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -21,6 +23,36 @@ def compose_result(url, result, websitename):
         'counterfeit': result,
         'date': datetime.now().date().isoformat()
     }
+
+
+def process_url_scrape(url):
+    """Main function for scraping a URL, detects counterfeits
+    and saves the result to the database. This function is called
+    from scrape_url route.
+
+    It scrapes the given URL, extracts all image URLs, and gets evaulated 
+    by the Ai API. The final result is composed and save to db.
+
+    Args:
+        url: The website URL to scrape
+
+    Returns:
+        dict: Result dictionary with keys: name, link, counterfeit, date
+    """
+    driver = build_driver()
+    data = get_scraping_data(url, driver)
+
+    if data is None:
+        raise ValueError('Failed to scrape the URL')
+
+    if not data.get('images'):
+        raise ValueError('No images found on the target page')
+
+    counterfeit_count = get_copycat_result(data['images'])
+    result = compose_result(url, counterfeit_count, data['name'])
+    save_result_to_db(result)
+
+    return result
 
 
 def get_copycat_result(image_urls):
