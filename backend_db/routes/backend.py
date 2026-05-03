@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 from universal_scraper import get_scraping_data, build_driver
-from scrape_url_util import compose_result, send_to_db, get_copycat_result
+from scrape_url_util import compose_result, get_copycat_result
 from flask_jwt_extended import jwt_required
+from db_utils import save_result_to_db
 
 
 backend_bp = Blueprint('backend', __name__)
@@ -28,5 +29,5 @@ def scrape_url():
     print(f'---------------------------------------------------')
     print(f"Composed result: {result}")
 
-    send_to_db(result)
+    save_result_to_db(result)
     return jsonify(result), 200

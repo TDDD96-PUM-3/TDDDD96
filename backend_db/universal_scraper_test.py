@@ -1,7 +1,7 @@
 import json
 from universal_scraper import get_scraping_data, build_driver
 
-TEST_URLSs = [
+TEST_URLS = [
     "https://www.amazon.com/Bordered-Silicone-Dressing-Waterproof-Breathable/dp/B08BWGVGTP/ref=sr_1_1_sspa?dib=eyJ2IjoiMSJ9.ZV02BNtZXQoBrqQQIy9y-SnmgOmsmvyGQLIc9ZByv9arLpVWq_HFnmLqMaR1Byh-HJRqWCg867DH7PjNGbSR0hmZ2lBLLgGPqGj-QoyF_xTjJmyYb7gcGQ-BebuYS-fgCsreiKdeohhTr6I2SFC0jfgZ1p1rO9ChKjt3QeuIjKIaSBS_NGZ-4hH2S4yOrZwYVpHFrM9mDOQV6bQM6AcjhHQNdpCYA8XhywCPwQhAUZQ.2PRPBRdM7jFg47JBiUcDXpWP7ZSAhGrNSccrwWuXH_s&dib_tag=se&keywords=m%C3%B6lnlycke&qid=1772530320&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1",
     "https://www.temu.com/gaming-headset-p-34567891234.html",
     "https://www.ebay.com/itm/389340071774?epid=12064992096&itmmeta=01KM0K23NBX0V20S7D8CDZBPXQ&hash=item5aa67a075e:g:VQ0AAeSwpKVpNFSE&itmprp=enc%3AAQALAAAA4DKQclQvzFwZQpmMrsO4Luqz69MrBeOo8uj8ZHREq4xNOi0pbtrRJ2Tg7lwpdPOKVgN7KkLGYZktWCh4JK1xPBR6hDDTI26MLFKcatNvP0OMh8HKz8bMsp%2FyMwxSPMLo2e59PMdpdtHvLhfio7HsM%2BvTzLV7MVbObda4Fzcv%2FPdPPZhDyZ%2FmPNv%2Fvdefjm%2Fk5PPOi%2FLTxLRtmOZgVmIHSk%2Bi7SvvCbE8HE%2FbIz4cyLeLJ%2BCR13rQNlhEgNXhW%2B2kKlON%2FjHpMpluNRoV0%2BrVnYqPcq8--Mq%2BxGdqswKRCgrU%7Ctkp%3ABFBM7rqIk6Bn&var=656654952199",
@@ -14,7 +14,7 @@ TEST_URLSs = [
     "https://www.elgiganten.se/product/vitvaror/tvatt-tork/tvattmaskin/electrolux-serie-600-tvattmaskin-efi622ex4e105kg/966285",
 ]
 
-TEST_URLS = [
+TEST_URLSs = [
     'https://www.molnlycke.com/sv-se/produkter/sarbehandling/skumforband-utan-fastkant/mepilex/'
 ]
 

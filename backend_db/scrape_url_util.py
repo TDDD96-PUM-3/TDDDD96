@@ -3,10 +3,11 @@ import os
 from io import BytesIO
 from datetime import datetime
 from urllib.parse import urlparse
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 import requests
 
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
 COPYCAT_API_CHECK_URL = os.getenv(
     'COPYCAT_API_CHECK_URL', 'http://localhost:3100/check')
 FLASK_API_URL = os.getenv('FLASK_API_URL', 'http://localhost:8000')
@@ -20,22 +21,6 @@ def compose_result(url, result, websitename):
         'counterfeit': result,
         'date': datetime.now().date().isoformat()
     }
-
-
-def send_to_db(result):
-    """ Helper function to save the result to the database."""
-
-    payload = {
-        'webname': result.get('name'),
-        'url': result.get('link'),
-        'result': result.get('counterfeit'),
-        'date': result.get('date')
-    }
-    response = requests.post(f'{FLASK_API_URL}/data', json=payload, timeout=10)
-    print(f'Database save response: {response.status_code} - {response.text}')
-    if response.status_code not in (200):
-        raise ValueError(
-            f'Failed to save result to database: {response.text}')
 
 
 def get_copycat_result(image_urls):
@@ -82,7 +67,9 @@ def img_url_to_file(url, max_bytes=MAX_IMAGE_BYTES):
     if parsed_url.scheme not in ('http', 'https'):
         raise ValueError('URL must use http or https.')
 
-    with urlopen(url, timeout=15) as response:
+    req = Request(url, headers={
+                  'User-Agent': USER_AGENT})
+    with urlopen(req, timeout=15) as response:
         content_type = response.headers.get_content_type()
         if not content_type.startswith('image/'):
             raise ValueError(
