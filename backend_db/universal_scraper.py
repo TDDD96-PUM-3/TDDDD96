@@ -6,6 +6,7 @@ No hardcoded site configs — everything is detected at runtime.
 """
 
 import logging
+import os
 import re
 from urllib.parse import urljoin, urlparse
 
@@ -93,16 +94,27 @@ def build_driver(headless: bool = True) -> webdriver.Chrome:
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
 
-    # Try to use system chromium-driver first (for Docker), fall back to webdriver-manager
-    try:
-        # Try selenium/standalone-chrome paths first
+    # Driver/binary resolution order:
+    # 1. Env vars set by the Dockerfile (CHROMEDRIVER_PATH / CHROME_BIN).
+    #    Works on any arch because apt installs the right native binary.
+    # 2. Old selenium/standalone-chrome image paths (kept for backward compat).
+    # 3. webdriver-manager download (for running outside Docker on dev machines).
+    chromedriver_path = os.getenv("CHROMEDRIVER_PATH")
+    chrome_bin = os.getenv("CHROME_BIN")
+
+    if chromedriver_path and os.path.exists(chromedriver_path):
+        service = Service(chromedriver_path)
+        if chrome_bin and os.path.exists(chrome_bin):
+            options.binary_location = chrome_bin
+        return webdriver.Chrome(service=service, options=options)
+
+    if os.path.exists("/opt/chromedriver"):
         service = Service("/opt/chromedriver")
         options.binary_location = "/opt/google/chrome/google-chrome"
         return webdriver.Chrome(service=service, options=options)
-    except Exception:
-        # Fall back to downloaded driver if system one not available
-        service = Service(ChromeDriverManager().install())
-        return webdriver.Chrome(service=service, options=options)
+
+    service = Service(ChromeDriverManager().install())
+    return webdriver.Chrome(service=service, options=options)
 
 
 # ── Generic popup removal ──────────────────────────────────────────────────────
