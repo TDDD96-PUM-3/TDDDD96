@@ -4,10 +4,11 @@ from extensions import db
 class SavedData(db.Model):
     __tablename__ = 'saved_data'
 
-    id         = db.Column(db.Integer, primary_key=True)
-    link       = db.Column(db.String(200), nullable=False)
-    result     = db.Column(db.Float, nullable=False)
-    date       = db.Column(db.Date, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    webname = db.Column(db.String(100), nullable=True)
+    link = db.Column(db.String(200), nullable=False)
+    result = db.Column(db.Float, nullable=False)
+    date = db.Column(db.Date, nullable=False)
 
     # TODO: lägg till fler kolumner här efter behov, t.ex.:
     # category = db.Column(db.String(100))
@@ -16,6 +17,7 @@ class SavedData(db.Model):
     def to_dict(self):
         return {
             'id':      self.id,
+            'webname': self.webname,
             'link':    self.link,
             'result':  self.result,
             'date':    self.date.isoformat() if self.date else None,

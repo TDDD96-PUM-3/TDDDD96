@@ -14,6 +14,10 @@ TEST_URLS = [
     "https://www.elgiganten.se/product/vitvaror/tvatt-tork/tvattmaskin/electrolux-serie-600-tvattmaskin-efi622ex4e105kg/966285",
 ]
 
+TEST_URLSs = [
+    'https://www.molnlycke.com/sv-se/produkter/sarbehandling/skumforband-utan-fastkant/mepilex/'
+]
+
 
 def test_universal_scraper():
 
@@ -49,5 +53,5 @@ def test_scrape_url_endpoint():
 
 
 if __name__ == "__main__":
-    test_universal_scraper()
-    # test_scrape_url_endpoint()
+    # test_universal_scraper()
+    test_scrape_url_endpoint()

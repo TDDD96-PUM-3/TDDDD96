@@ -1,4 +1,3 @@
-from flask import request, jsonify
 from scrape_url_util import get_copycat_result
 from universal_scraper import get_scraping_data, build_driver
 
@@ -13,6 +12,10 @@ TEST_URLS = [
     "https://www.target.com/p/what-do-you-meme-emotional-support-minis-chocolate-bunnies-stuffed-animal/-/A-94961278#lnk=sametab",
     "https://www.blocket.se/mobility/item/21419403",
     "https://www.elgiganten.se/product/vitvaror/tvatt-tork/tvattmaskin/electrolux-serie-600-tvattmaskin-efi622ex4e105kg/966285",
+]
+
+TEST_URLSs = [
+    'https://www.molnlycke.com/sv-se/produkter/sarbehandling/skumforband-utan-fastkant/mepilex/'
 ]
 
 

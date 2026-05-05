@@ -1,53 +1,29 @@
-from datetime import date as date_cls, datetime
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from extensions import db
 from models import SavedData
+from db_utils import save_result_to_db, _parse_date
 
 data_bp = Blueprint('data', __name__)
-
-
-def _parse_date(value):
-    """ Acceptera ISO-datum (YYYY-MM-DD) eller None. Returnerar date eller None. """
-    if value is None or value == '':
-        return None
-    try:
-        return datetime.strptime(value, '%Y-%m-%d').date()
-    except (TypeError, ValueError):
-        return False  # markerar ogiltigt värde
 
 
 @data_bp.route('/data', methods=['POST'])
 @jwt_required()
 def create_entry():
-    """ Skapa en ny datapost (link, result, date). Inga relationer. """
-    data = request.get_json() or {}
-    link = data.get('link')
-    result = data.get('result')
-    date_value = data.get('date')
-
-    # Obligatoriska fält
-    if not link or result is None:
-        return jsonify({'message': 'link och result krävs'}), 400
-
-    # result ska vara numeriskt
+    """ Creates a new data entry from endpoint. Expects JSON
+    with fields: webname, url, result, date (YYYY-MM-DD). """
+    data = request.get_json()
+    result = {
+        'name': data.get('webname'),
+        'link': data.get('url'),
+        'counterfeit': data.get('result'),
+        'date': data.get('date')
+    }
     try:
-        result = float(result)
-    except (TypeError, ValueError):
-        return jsonify({'message': 'result måste vara ett tal'}), 400
-
-    # Datum – default till dagens datum om inget skickas in
-    parsed_date = _parse_date(date_value)
-    if parsed_date is False:
-        return jsonify({'message': 'date måste vara i formatet YYYY-MM-DD'}), 400
-    if parsed_date is None:
-        parsed_date = date_cls.today()
-
-    entry = SavedData(link=link, result=result, date=parsed_date)
-    db.session.add(entry)
-    db.session.commit()
-
-    return jsonify(entry.to_dict()), 201
+        save_result_to_db(result)
+        return jsonify({'message': 'Data entry succesfully created'}), 201
+    except ValueError as exc:
+        return jsonify({'message': str(exc)}), 400
 
 
 @data_bp.route('/data', methods=['GET'])
@@ -78,8 +54,12 @@ def update_entry(entry_id):
 
     data = request.get_json() or {}
 
+    if 'webname' in data:
+        if not data['webname']:
+            return jsonify({'message': 'webname får inte vara tomt'}), 400
+        entry.webname = data['webname']
     if 'link' in data:
-        if not data['link']:
+        if not data['url']:
             return jsonify({'message': 'link får inte vara tomt'}), 400
         entry.link = data['link']
 
