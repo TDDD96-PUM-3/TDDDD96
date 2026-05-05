@@ -94,12 +94,44 @@ def delete_entry(entry_id):
 
 @data_bp.route('/data/stats', methods=['GET'])
 def get_stats():
-    """ Gather stats for the stats page piecharts"""
-    # Total images checked flagged / total images checked
-    found_counterfeits_tot_img = 1
-    # Total websites with at least 1 flagged / total websites checked
-    found_counterfeits_per_web = 2
-    # result from prev scrape images flagged / total images checked
-    result_from_prev_scrape = 3
-    # website with highest percentage of flagged images and its results
-    highest_flagged_percentage = 0
+    """Gather stats for the stats page piecharts."""
+    entries = SavedData.query.order_by(
+        SavedData.date.desc(), SavedData.id.desc()
+    ).all()
+
+    total_web = len(entries)
+    flagged_web = 1
+    flagged_img = 1
+
+    latest_entry = 2
+    highest_entry = 3
+
+    return jsonify({
+        'found_counterfeits_tot_img': {
+            'flagged_img': flagged_img,
+            'total_img': None,  # placehold
+        },
+        'found_counterfeits_per_web': {
+            'flagged_web': flagged_web,
+            'total_web': total_web,
+        },
+        'result_from_prev_scrape': (
+            {
+                'web_url': latest_entry.link,
+                'webname': latest_entry.webname,
+                'flagged_img': int(latest_entry.result or 0),
+                'total_img': None,
+            }
+            if latest_entry else None
+        ),
+        'highest_flagged_percentage': (
+            {
+                'web_url': highest_entry.link,
+                'webname': highest_entry.webname,
+                'flagged_img': int(highest_entry.result or 0),
+                'total_img': None,
+                'flagged_percentage': None,
+            }
+            if highest_entry else None
+        )
+    }), 200
