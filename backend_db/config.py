@@ -1,15 +1,18 @@
 import os
 
+
 class Config:
     """ Baskonfiguration som delas av alla miljöer """
     JWT_SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-change-in-prod')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 class DevelopmentConfig(Config):
     """ Lokal utveckling – SQLite """
     DEBUG = True
     db_path = os.path.join(os.path.dirname(__file__), 'app.db')
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_path}'
+
 
 class ProductionConfig(Config):
     """ Produktion – PostgreSQL (t.ex. Azure) """

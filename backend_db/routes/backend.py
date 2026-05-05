@@ -17,4 +17,7 @@ def scrape_url():
         result = process_url_scrape(url)
         return jsonify(result), 200
     except ValueError as exc:
-        return jsonify({'error': str(exc)}), 500
+        return jsonify({'error': str(exc)}), 400
+    except Exception as exc:
+        print(f"Error scraping URL {url}: {str(exc)}")
+        return jsonify({'error': f'Server error: {str(exc)}'}), 500

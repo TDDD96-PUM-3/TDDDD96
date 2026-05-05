@@ -93,8 +93,16 @@ def build_driver(headless: bool = True) -> webdriver.Chrome:
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
 
-    service = Service(ChromeDriverManager().install())
-    return webdriver.Chrome(service=service, options=options)
+    # Try to use system chromium-driver first (for Docker), fall back to webdriver-manager
+    try:
+        # Try selenium/standalone-chrome paths first
+        service = Service("/opt/chromedriver")
+        options.binary_location = "/opt/google/chrome/google-chrome"
+        return webdriver.Chrome(service=service, options=options)
+    except Exception:
+        # Fall back to downloaded driver if system one not available
+        service = Service(ChromeDriverManager().install())
+        return webdriver.Chrome(service=service, options=options)
 
 
 # ── Generic popup removal ──────────────────────────────────────────────────────
