@@ -71,16 +71,36 @@
   padding: 20px;
 }
 
-.bar {
+.prediction-value {
   position: absolute;
   left: 20px;
   right: 20px;
   bottom: 20px;
 }
 
-.bar-text {
+.prediction-value span {
+  display: block;
+  width: 100%;
+  color: #00402f;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prediction-text {
   position: absolute;
-  bottom: 27px;
+  left: 20px;
+  right: 20px;
+  bottom: 48px;
+}
+
+.prediction-text p {
+  margin: 0;
+  color: #4a4a4a;
+  font-size: 0.85rem;
 }
 
 .sort-controls {

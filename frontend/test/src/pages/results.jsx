@@ -1,7 +1,55 @@
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import "./results.css";
-import LinearWithValueLabel from "../components/PercentageBar.jsx";
+
+const PLACEHOLDER_IMAGE = "https://via.placeholder.com/512?text=Website";
+
+function getPredictionLabel(product) {
+  if (product.prediction) {
+    return product.prediction.replace("copyright_infringement_of_", "");
+  }
+
+  return product.counterfeit ? "Counterfeit" : "OK";
+}
+
+function normalizeProducts(data, query) {
+  if (!data) {
+    return null;
+  }
+
+  if (Array.isArray(data.products) && data.products.length > 0) {
+    return data.products.map((product, index) => ({
+      id: product.id ?? `${product.picture ?? product.link ?? "product"}-${index}`,
+      name: product.name || `${data.name || "Product"} ${index + 1}`,
+      link: product.link || data.link || query,
+      picture: product.picture || product.image || product.image_url || PLACEHOLDER_IMAGE,
+      counterfeit: Number(product.counterfeit) || 0,
+      prediction: product.prediction || "",
+    }));
+  }
+
+  if (Array.isArray(data.images) && data.images.length > 0) {
+    return data.images.map((image, index) => ({
+      id: `${image}-${index}`,
+      name: `${data.name || "Product"} ${index + 1}`,
+      link: data.link || query,
+      picture: image,
+      counterfeit: 0,
+      prediction: "OK",
+    }));
+  }
+
+  return [
+    {
+      id: 1,
+      name: data.name || "Website",
+      link: data.link || query,
+      picture: data.picture || data.image || PLACEHOLDER_IMAGE,
+      counterfeit: Number(data.counterfeit) || 0,
+      prediction: data.prediction || "",
+    },
+  ];
+}
 
 export default function Results() {
   const location = useLocation();
@@ -12,17 +60,7 @@ export default function Results() {
   const [sortType, setSortType] = useState("risk-high");
 
   // Use the data from the backend API call, or fallback to fake data if not available
-  const fake_products = data
-    ? [
-        {
-          id: 1,
-          name: data.name || "Website",
-          link: data.link || query,
-          picture: "https://via.placeholder.com/512?text=Website",
-          counterfeit: data.counterfeit || 0,
-        },
-      ]
-    : [
+  const products = normalizeProducts(data, query) || [
       {
         id: 1,
         name: "EasyWarm+",
@@ -30,6 +68,7 @@ export default function Results() {
         picture:
           "https://minervablob.blob.core.windows.net/resized-images-container/BARRIER%20Easywarm+-629910_124877_E-512x512.png?sv=2019-07-07&sr=b&sig=aEwfap14IHBPvQveasXLv8i5djcmaAEPIplIFMIfjOc%3D&se=2029-04-07T21%3A31%3A45Z&sp=r",
         counterfeit: 0.2,
+        prediction: "copyright_infringement_of_EasyWarm+",
       },
       {
         id: 2,
@@ -38,6 +77,7 @@ export default function Results() {
         picture:
           "https://minervablob.blob.core.windows.net/resized-images-container/Filtering%20Half%20Mask-42904,42902_104373_E-512x512.png?sv=2019-07-07&sr=b&sig=klj27vnnUfEIBY48%2FEcPCZYKJygomgTg7uTarw1UKLI%3D&se=2029-04-07T21%3A31%3A45Z&sp=r",
         counterfeit: 0.5,
+        prediction: "copyright_infringement_of_Filtrerande munskydd, PPE",
       },
       {
         id: 5,
@@ -46,6 +86,7 @@ export default function Results() {
         picture:
           "https://minervablob.blob.core.windows.net/resized-images-container/Filtering%20Half%20Mask-42904,42902_104373_E-512x512.png?sv=2019-07-07&sr=b&sig=klj27vnnUfEIBY48%2FEcPCZYKJygomgTg7uTarw1UKLI%3D&se=2029-04-07T21%3A31%3A45Z&sp=r",
         counterfeit: 0.25,
+        prediction: "copyright_infringement_of_Filtrerande munskydd, PPE",
       },
       {
         id: 3,
@@ -54,6 +95,7 @@ export default function Results() {
         picture:
           "https://m.media-amazon.com/images/I/61yx+36SSbL._AC_UL480_FMwebp_QL65_.jpg",
         counterfeit: 0.02,
+        prediction: "OK",
       },
       {
         id: 4,
@@ -62,10 +104,11 @@ export default function Results() {
         picture:
           "https://minervablob.blob.core.windows.net/resized-images-container/Staff%20clothing%20in%20the%20OR%E2%80%93030_187258_E-512x512.png?sv=2019-07-07&sr=b&sig=jQ8u2k4wfq3mMZScb1Kx6q0yB9AbGiOWCQ2ac0magA0%3D&se=2029-04-07T21%3A31%3A45Z&sp=r",
         counterfeit: 0.92,
+        prediction: "copyright_infringement_of_Hjälmar",
       },
     ];
 
-  const sortedProducts = [...fake_products].sort((a, b) => {
+  const sortedProducts = [...products].sort((a, b) => {
     switch (sortType) {
       case "risk-high":
         return b.counterfeit - a.counterfeit;
@@ -114,11 +157,11 @@ export default function Results() {
               <div className="name">
                 <h5 className="product-link">{product.name}</h5>
               </div>
-              <div className="bar-text">
-                <p>Counterfeit probability:</p>
+              <div className="prediction-text">
+                <p>Copycat prediction:</p>
               </div>
-              <div className="bar">
-                <LinearWithValueLabel percentage={product.counterfeit * 100} />
+              <div className="prediction-value">
+                <span>{getPredictionLabel(product)}</span>
               </div>
             </div>
           </a>
