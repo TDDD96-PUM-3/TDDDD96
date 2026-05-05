@@ -90,3 +90,16 @@ def delete_entry(entry_id):
     db.session.delete(entry)
     db.session.commit()
     return jsonify({'message': 'Datapost borttagen'}), 200
+
+
+@data_bp.route('/data/stats', methods=['GET'])
+def get_stats():
+    """ Gather stats for the stats page piecharts"""
+    # Total images checked flagged / total images checked
+    found_counterfeits_tot_img = 1
+    # Total websites with at least 1 flagged / total websites checked
+    found_counterfeits_per_web = 2
+    # result from prev scrape images flagged / total images checked
+    result_from_prev_scrape = 3
+    # website with highest percentage of flagged images and its results
+    highest_flagged_percentage = 0
