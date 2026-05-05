@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_cors import CORS
 from config import config
 from extensions import db, jwt, bcrypt
@@ -13,10 +13,6 @@ def create_app(env=None):
     # Ladda konfiguration
     env = env or os.getenv('FLASK_ENV', 'default')
     app.config.from_object(config[env])
-
-    # Ensure data directory exists for SQLite database
-    data_dir = '/app/data'
-    os.makedirs(data_dir, exist_ok=True)
 
     # Koppla extensions till appen
     db.init_app(app)
