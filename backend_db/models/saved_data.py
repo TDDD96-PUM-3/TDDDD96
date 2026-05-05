@@ -7,7 +7,8 @@ class SavedData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     webname = db.Column(db.String(100), nullable=True)
     link = db.Column(db.String(200), nullable=False)
-    result = db.Column(db.Float, nullable=False)
+    counterfeit_count = db.Column(db.Float, nullable=False)
+    tot_image_count = db.Column(db.Float, nullable=True)
     date = db.Column(db.Date, nullable=False)
 
     # TODO: lägg till fler kolumner här efter behov, t.ex.:
@@ -19,6 +20,7 @@ class SavedData(db.Model):
             'id':      self.id,
             'webname': self.webname,
             'link':    self.link,
-            'result':  self.result,
+            'counterfeit_count':  self.counterfeit_count,
+            'tot_image_count': self.tot_image_count,
             'date':    self.date.isoformat() if self.date else None,
         }

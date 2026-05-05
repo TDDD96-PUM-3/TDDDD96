@@ -18,14 +18,15 @@ def save_result_to_db(result):
     """
     webname = result.get('name')
     link = result.get('link')
-    counterfeit = result.get('counterfeit')
+    counterfeit_count = result.get('counterfeit')
+    total_count = result.get('total')
     date_str = result.get('date')
 
-    if not link or counterfeit is None:
+    if not link or counterfeit_count is None:
         raise ValueError('link and result are required')
 
     try:
-        counterfeit_val = float(counterfeit)
+        counterfeit_val = float(counterfeit_count)
     except (TypeError, ValueError):
         raise ValueError('result must be a number')
 
@@ -35,8 +36,8 @@ def save_result_to_db(result):
     if parsed_date is None:
         parsed_date = date_cls.today()
 
-    entry = SavedData(webname=webname, link=link,
-                      result=counterfeit_val, date=parsed_date)
+    entry = SavedData(webname=webname, link=link, counterfeit_count=counterfeit_val,
+                      tot_image_count=total_count, date=parsed_date)
     db.session.add(entry)
     db.session.commit()
     return entry

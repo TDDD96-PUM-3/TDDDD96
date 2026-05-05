@@ -100,16 +100,32 @@ def get_stats():
     ).all()
 
     total_web = len(entries)
-    flagged_web = 1
-    flagged_img = 1
+    flagged_web = sum(1 for entry in entries if entry.counterfeit_count > 0)
+    total_img = sum(
+        entry.tot_image_count for entry in entries if entry.tot_image_count)
+    flagged_img = sum(entry.counterfeit_count for entry in entries)
 
-    latest_entry = 2
-    highest_entry = 3
+    latest_entry = entries[0] if entries else None  # Need rework
+    latest_entry_link = latest_entry.link if latest_entry else None
+    latest_entry_webname = latest_entry.webname if latest_entry else None
+    latest_entry_total_img = latest_entry.tot_image_count if latest_entry else None
+    latest_entry_flagged_img = latest_entry.counterfeit_count if latest_entry else None
+
+    highest_entry = entries[0] if entries else None
+    for entry in entries:
+        if entry.counterfeit_count > highest_entry.counterfeit_count:
+            highest_entry = entry
+
+    highest_entry_link = highest_entry.link if highest_entry else None
+    highest_entry_webname = highest_entry.webname if highest_entry else None
+    highest_entry_flagged_img = int(
+        highest_entry.counterfeit_count) if highest_entry else None
+    highest_entry_total_img = highest_entry.tot_image_count if highest_entry else None
 
     return jsonify({
         'found_counterfeits_tot_img': {
             'flagged_img': flagged_img,
-            'total_img': None,  # placehold
+            'total_img': total_img
         },
         'found_counterfeits_per_web': {
             'flagged_web': flagged_web,
@@ -117,21 +133,18 @@ def get_stats():
         },
         'result_from_prev_scrape': (
             {
-                'web_url': latest_entry.link,
-                'webname': latest_entry.webname,
-                'flagged_img': int(latest_entry.result or 0),
-                'total_img': None,
+                'web_url': latest_entry_link,
+                'webname': latest_entry_webname,
+                'flagged_img': latest_entry_flagged_img,
+                'total_img': latest_entry_total_img,
             }
-            if latest_entry else None
         ),
-        'highest_flagged_percentage': (
+        'highest_flagged_count': (
             {
-                'web_url': highest_entry.link,
-                'webname': highest_entry.webname,
-                'flagged_img': int(highest_entry.result or 0),
-                'total_img': None,
-                'flagged_percentage': None,
+                'web_url': highest_entry_link,
+                'webname': highest_entry_webname,
+                'flagged_img': highest_entry_flagged_img,
+                'total_img': highest_entry_total_img,
             }
-            if highest_entry else None
         )
     }), 200
