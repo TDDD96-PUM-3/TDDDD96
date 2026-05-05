@@ -15,12 +15,14 @@ COPYCAT_API_CHECK_URL = os.getenv(
 FLASK_API_URL = os.getenv('FLASK_API_URL', 'http://localhost:8000')
 
 
-def compose_result_db(url, result, websitename):
+def compose_result(url, result, websitename, products=None):
     """ Helper function to compose the result dictionary for saving to the database."""
     return {
         'name': websitename,
         'link': url,
         'counterfeit': result,
+        'date': datetime.now().date().isoformat(),
+        'products': products or []
         'date': datetime.now().date().isoformat(),
         'products': products or []
     }
@@ -46,7 +48,7 @@ def process_url_scrape(url):
     and saves the result to the database. This function is called
     from scrape_url route.
 
-    It scrapes the given URL, extracts all image URLs, and gets evaulated 
+    It scrapes the given URL, extracts all image URLs, and gets evaulated
     by the Ai API. The final result is composed and save to db.
 
     Args:
@@ -65,6 +67,12 @@ def process_url_scrape(url):
         raise ValueError('No images found on the target page')
 
     counterfeit_count, flagged_images = get_copycat_result(data['images'])
+
+    products = get_copycat_result(data['images'], url, data['name'])
+    counterfeit_count = sum(product['counterfeit'] for product in products)
+    result = compose_result(url, counterfeit_count, data['name'], products)
+    save_result_to_db({key: result[key]
+                       for key in ('name', 'link', 'counterfeit', 'date')})
 
     result_db = compose_result_db(url, counterfeit_count, data['name'])
     save_result_to_db(result_db)
@@ -91,7 +99,10 @@ def get_copycat_result(image_urls, page_url=None, website_name=None):
         raise ValueError('No image URLs provided for model inference.')
     last_error = None
     successful_calls = 0
+
     flagged_images = []
+
+    products = []
 
     for index, image_url in enumerate(image_urls, start=1):
         try:
@@ -105,10 +116,22 @@ def get_copycat_result(image_urls, page_url=None, website_name=None):
             json_resp = response.json()
             prediction = json_resp.get('prediction', 'OK')
             successful_calls += 1
+
             if 'copyright_infringement_of_' in prediction:
                 counterfeit_count += 1
                 flagged_images.append(
                     {'url': image_url, 'prediction': prediction})
+
+            is_counterfeit = 'copyright_infringement_of_' in prediction
+            products.append({
+                'id': index,
+                'name': prediction.replace('copyright_infringement_of_', '') if is_counterfeit else f'{website_name or "Product"} image {index}',
+                'link': page_url or image_url,
+                'picture': image_url,
+                'counterfeit': 1 if is_counterfeit else 0,
+                'prediction': prediction,
+            })
+
         except (ValueError, requests.RequestException) as exc:
             last_error = exc
             continue
@@ -116,7 +139,7 @@ def get_copycat_result(image_urls, page_url=None, website_name=None):
     if last_error and successful_calls == 0:
         raise ValueError(
             f'Failed to run model inference: {last_error}') from last_error
-    return counterfeit_count, flagged_images
+    return products
 
 
 def img_url_to_file(url, max_bytes=MAX_IMAGE_BYTES):
