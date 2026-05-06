@@ -66,30 +66,26 @@ def process_url_scrape(url):
     if not data.get('images'):
         raise ValueError('No images found on the target page')
 
-    counterfeit_count, flagged_images = get_copycat_result(data['images'])
-
     products = get_copycat_result(data['images'], url, data['name'])
     counterfeit_count = sum(product['counterfeit'] for product in products)
     result = compose_result(url, counterfeit_count, data['name'], products)
     save_result_to_db({key: result[key]
                        for key in ('name', 'link', 'counterfeit', 'date')})
 
-    result_db = compose_result_db(url, counterfeit_count, data['name'])
-    save_result_to_db(result_db)
+    products_by_image = {product['picture']: product for product in products}
 
-    frontend_result = {
-        'name': result_db['name'],
-        'link': result_db['link'],
+    return {
+        'name': result['name'],
+        'link': result['link'],
         'flagged_images': [
             {
-                'image_url': item['url'],
-                'prediction': item.get('prediction')
+                'image_url': image_url,
+                'prediction': products_by_image.get(
+                    image_url, {}).get('prediction', 'OK')
             }
-            for item in flagged_images
+            for image_url in data['images']
         ]
     }
-
-    return frontend_result
 
 
 def get_copycat_result(image_urls, page_url=None, website_name=None):
@@ -99,8 +95,6 @@ def get_copycat_result(image_urls, page_url=None, website_name=None):
         raise ValueError('No image URLs provided for model inference.')
     last_error = None
     successful_calls = 0
-
-    flagged_images = []
 
     products = []
 
@@ -116,11 +110,6 @@ def get_copycat_result(image_urls, page_url=None, website_name=None):
             json_resp = response.json()
             prediction = json_resp.get('prediction', 'OK')
             successful_calls += 1
-
-            if 'copyright_infringement_of_' in prediction:
-                counterfeit_count += 1
-                flagged_images.append(
-                    {'url': image_url, 'prediction': prediction})
 
             is_counterfeit = 'copyright_infringement_of_' in prediction
             products.append({

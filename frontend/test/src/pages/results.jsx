@@ -17,22 +17,43 @@ function normalizeProducts(data, query) {
     return null;
   }
 
+  const pageLink = data.link || query;
+
   if (Array.isArray(data.products) && data.products.length > 0) {
     return data.products.map((product, index) => ({
       id: product.id ?? `${product.picture ?? product.link ?? "product"}-${index}`,
       name: product.name || `${data.name || "Product"} ${index + 1}`,
-      link: product.link || data.link || query,
+      link: product.link || pageLink,
       picture: product.picture || product.image || product.image_url || PLACEHOLDER_IMAGE,
       counterfeit: Number(product.counterfeit) || 0,
       prediction: product.prediction || "",
     }));
   }
 
+  if (Array.isArray(data.flagged_images) && data.flagged_images.length > 0) {
+    return data.flagged_images.map((item, index) => {
+      const imageUrl = typeof item === "string" ? item : item?.image_url || item?.url;
+      const prediction = typeof item === "object" ? item?.prediction : "";
+      const isCounterfeit = prediction?.includes("copyright_infringement_of_");
+
+      return {
+        id: `${imageUrl || "flagged"}-${index}`,
+        name: isCounterfeit
+          ? prediction.replace("copyright_infringement_of_", "")
+          : `${data.name || "Product"} ${index + 1}`,
+        link: item?.link || pageLink,
+        picture: imageUrl || PLACEHOLDER_IMAGE,
+        counterfeit: isCounterfeit ? 1 : 0,
+        prediction: prediction || "OK",
+      };
+    });
+  }
+
   if (Array.isArray(data.images) && data.images.length > 0) {
     return data.images.map((image, index) => ({
       id: `${image}-${index}`,
       name: `${data.name || "Product"} ${index + 1}`,
-      link: data.link || query,
+      link: pageLink,
       picture: image,
       counterfeit: 0,
       prediction: "OK",
@@ -43,7 +64,7 @@ function normalizeProducts(data, query) {
     {
       id: 1,
       name: data.name || "Website",
-      link: data.link || query,
+      link: pageLink,
       picture: data.picture || data.image || PLACEHOLDER_IMAGE,
       counterfeit: Number(data.counterfeit) || 0,
       prediction: data.prediction || "",

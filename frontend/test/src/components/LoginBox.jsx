@@ -40,7 +40,7 @@ function Login() {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" className="login-btn w-100" onClick={Login}>
+            <Button variant="primary" type="submit" className="login-btn w-100">
               Login
             </Button>
           </Form>
