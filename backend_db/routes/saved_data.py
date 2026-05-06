@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from extensions import db
 from models import SavedData
-from db_utils import save_result_to_db, _parse_date
+from db_utils import save_result_to_db, _parse_date, build_stats_payload
 
 data_bp = Blueprint('data', __name__)
 
@@ -90,3 +90,13 @@ def delete_entry(entry_id):
     db.session.delete(entry)
     db.session.commit()
     return jsonify({'message': 'Datapost borttagen'}), 200
+
+
+@data_bp.route('/data/stats', methods=['GET'])
+def get_stats():
+    """Gather stats for the stats page piecharts."""
+    entries = SavedData.query.order_by(
+        SavedData.date.desc(), SavedData.id.desc()
+    ).all()
+
+    return jsonify(build_stats_payload(entries)), 200

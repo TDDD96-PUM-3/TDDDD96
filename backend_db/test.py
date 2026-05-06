@@ -1,10 +1,12 @@
 import tempfile
 import os
+from datetime import date
 import pytest
 from io import BytesIO
 from app import create_app
 from extensions import db, bcrypt
 from models.user import User
+from models.saved_data import SavedData
 
 
 @pytest.fixture()
@@ -102,3 +104,38 @@ def test_multiple_tokens(client):
     token2 = client.post(
         '/login', json={'username': 'Nisse', 'password': 'Struts123'}).get_json()['access_token']
     assert token1 != token2
+
+
+def test_get_stats(client, app):
+    with app.app_context():
+        first = SavedData(
+            webname='Latest site',
+            link='https://latest.example',
+            counterfeit_count=2.0,
+            tot_image_count=5.0,
+            date=date(2024, 2, 1),
+        )
+        second = SavedData(
+            webname='Highest site',
+            link='https://highest.example',
+            counterfeit_count=7.0,
+            tot_image_count=10.0,
+            date=date(2024, 1, 1),
+        )
+        db.session.add_all([first, second])
+        db.session.commit()
+
+    rv = client.get('/data/stats')
+
+    assert rv.status_code == 200
+    payload = rv.get_json()
+    assert payload['found_counterfeits_per_web'] == {
+        'flagged_web': 2,
+        'total_web': 2,
+    }
+    assert payload['found_counterfeits_tot_img'] == {
+        'flagged_img': 9.0,
+        'total_img': 15.0,
+    }
+    assert payload['result_from_prev_scrape']['web_url'] == 'https://latest.example'
+    assert payload['highest_flagged_count']['web_url'] == 'https://highest.example'
