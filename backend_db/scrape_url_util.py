@@ -22,7 +22,7 @@ def compose_result(url, result, websitename, products=None):
         'link': url,
         'counterfeit': result,
         'date': datetime.now().date().isoformat(),
-        'products': products or []
+        'products': products or [],
         'date': datetime.now().date().isoformat(),
         'products': products or []
     }
