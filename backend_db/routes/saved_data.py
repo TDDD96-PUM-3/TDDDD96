@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from extensions import db
 from models import SavedData
-from db_utils import save_result_to_db, _parse_date
+from db_utils import save_result_to_db, _parse_date, build_stats_payload
 
 data_bp = Blueprint('data', __name__)
 
@@ -99,52 +99,4 @@ def get_stats():
         SavedData.date.desc(), SavedData.id.desc()
     ).all()
 
-    total_web = len(entries)
-    flagged_web = sum(1 for entry in entries if entry.counterfeit_count > 0)
-    total_img = sum(
-        entry.tot_image_count for entry in entries if entry.tot_image_count)
-    flagged_img = sum(entry.counterfeit_count for entry in entries)
-
-    latest_entry = entries[0] if entries else None  # Need rework
-    latest_entry_link = latest_entry.link if latest_entry else None
-    latest_entry_webname = latest_entry.webname if latest_entry else None
-    latest_entry_total_img = latest_entry.tot_image_count if latest_entry else None
-    latest_entry_flagged_img = latest_entry.counterfeit_count if latest_entry else None
-
-    highest_entry = entries[0] if entries else None
-    for entry in entries:
-        if entry.counterfeit_count > highest_entry.counterfeit_count:
-            highest_entry = entry
-
-    highest_entry_link = highest_entry.link if highest_entry else None
-    highest_entry_webname = highest_entry.webname if highest_entry else None
-    highest_entry_flagged_img = int(
-        highest_entry.counterfeit_count) if highest_entry else None
-    highest_entry_total_img = highest_entry.tot_image_count if highest_entry else None
-
-    return jsonify({
-        'found_counterfeits_tot_img': {
-            'flagged_img': flagged_img,
-            'total_img': total_img
-        },
-        'found_counterfeits_per_web': {
-            'flagged_web': flagged_web,
-            'total_web': total_web,
-        },
-        'result_from_prev_scrape': (
-            {
-                'web_url': latest_entry_link,
-                'webname': latest_entry_webname,
-                'flagged_img': latest_entry_flagged_img,
-                'total_img': latest_entry_total_img,
-            }
-        ),
-        'highest_flagged_count': (
-            {
-                'web_url': highest_entry_link,
-                'webname': highest_entry_webname,
-                'flagged_img': highest_entry_flagged_img,
-                'total_img': highest_entry_total_img,
-            }
-        )
-    }), 200
+    return jsonify(build_stats_payload(entries)), 200
