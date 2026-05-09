@@ -177,11 +177,9 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
                 if full:
                     images.add(full)
 
-    # Filter: keep only URLs with image extension in path, and exclude any with query params
     result = []
     for u in images:
-        parsed = urlparse(u)
-        if img_ext.search(parsed.path) and not parsed.query:
+        if img_ext.search(u):
             result.append(u)
 
     return result
