@@ -83,7 +83,7 @@ npm run dev
 
 4. Open the frontend at http://localhost:5173
 
-## Extension Setup
+## Extension Setup - MAybe update/remove
 
 1. Open this folder in VS Code.
 2. Install recommended extensions when prompted.
