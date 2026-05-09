@@ -37,3 +37,26 @@ export const scrapeUrl = async (url) => {
     throw error;
   }
 };
+
+export const getStats = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/data/stats`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.error || `HTTP error! status: ${response.status}`,
+      );
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    throw error;
+  }
+};
