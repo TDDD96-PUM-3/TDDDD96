@@ -15,12 +15,13 @@ COPYCAT_API_CHECK_URL = os.getenv(
 FLASK_API_URL = os.getenv('FLASK_API_URL', 'http://localhost:8000')
 
 
-def compose_result_db(url, result, websitename):
+def compose_result_db(url, result, websitename, total_images):
     """ Helper function to compose the result dictionary for saving to the database."""
     return {
         'name': websitename,
         'link': url,
         'counterfeit': result,
+        'total': total_images,
         'date': datetime.now().date().isoformat()
     }
 
@@ -65,7 +66,12 @@ def process_url_scrape(url):
 
     counterfeit_count, flagged_images = get_copycat_result(data['images'])
 
-    result_db = compose_result_db(url, counterfeit_count, data['name'])
+    result_db = compose_result_db(
+        url,
+        counterfeit_count,
+        data['name'],
+        len(data['images'])
+    )
     save_result_to_db(result_db)
 
     frontend_result = {
@@ -73,7 +79,7 @@ def process_url_scrape(url):
         'link': result_db['link'],
         'flagged_images': [
             {
-                'image_url': item['url'],
+                'image_url': item.get('url'),
                 'prediction': item.get('prediction')
             }
             for item in flagged_images
