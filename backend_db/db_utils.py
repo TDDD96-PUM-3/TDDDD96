@@ -46,8 +46,7 @@ def save_result_to_db(result):
 def build_stats_payload(entries):
     total_web = len(entries)
     flagged_web = sum(1 for entry in entries if entry.counterfeit_count > 0)
-    total_img = sum(
-        entry.tot_image_count for entry in entries if entry.tot_image_count)
+    total_img = sum((entry.tot_image_count or 0) for entry in entries)
     flagged_img = sum(entry.counterfeit_count for entry in entries)
 
     latest_entry = entries[0] if entries else None

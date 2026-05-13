@@ -3,7 +3,6 @@ import os
 from io import BytesIO
 from datetime import datetime
 from urllib.parse import urlparse
-from urllib.request import urlopen, Request
 import requests
 from universal_scraper import get_scraping_data, build_driver
 from db_utils import save_result_to_db
@@ -15,12 +14,13 @@ COPYCAT_API_CHECK_URL = os.getenv(
 FLASK_API_URL = os.getenv('FLASK_API_URL', 'http://localhost:8000')
 
 
-def compose_result_db(url, result, websitename):
+def compose_result_db(url, result, websitename, total_images):
     """ Helper function to compose the result dictionary for saving to the database."""
     return {
         'name': websitename,
         'link': url,
         'counterfeit': result,
+        'total': total_images,
         'date': datetime.now().date().isoformat()
     }
 
@@ -63,9 +63,15 @@ def process_url_scrape(url):
     if not data.get('images'):
         raise ValueError('No images found on the target page')
 
-    counterfeit_count, flagged_images = get_copycat_result(data['images'])
+    counterfeit_count, flagged_images = get_copycat_result(
+        data['images'], referer=url)
 
-    result_db = compose_result_db(url, counterfeit_count, data['name'])
+    result_db = compose_result_db(
+        url,
+        counterfeit_count,
+        data['name'],
+        len(data['images'])
+    )
     save_result_to_db(result_db)
 
     frontend_result = {
@@ -73,7 +79,7 @@ def process_url_scrape(url):
         'link': result_db['link'],
         'flagged_images': [
             {
-                'image_url': item['url'],
+                'image_url': item.get('url'),
                 'prediction': item.get('prediction')
             }
             for item in flagged_images
@@ -83,7 +89,7 @@ def process_url_scrape(url):
     return frontend_result
 
 
-def get_copycat_result(image_urls):
+def get_copycat_result(image_urls, referer=None):
     """Send scraped image URLs to Copycat API and return amount of counterfeit images detected
     on a website url. Has some error handling.
     """
@@ -96,7 +102,8 @@ def get_copycat_result(image_urls):
 
     for image_url in image_urls:
         try:
-            filename, file_obj, content_type = img_url_to_file(image_url)
+            filename, file_obj, content_type = img_url_to_file(
+                image_url, referer=referer)
             response = requests.post(
                 COPYCAT_API_CHECK_URL,
                 files={'file': (filename, file_obj, content_type)},
@@ -120,31 +127,45 @@ def get_copycat_result(image_urls):
     return counterfeit_count, flagged_images
 
 
-def img_url_to_file(url, max_bytes=MAX_IMAGE_BYTES):
+def img_url_to_file(url, max_bytes=MAX_IMAGE_BYTES, referer=None):
     """Download an image URL and return it as an in-memory file object.
     Returns a tuple: (filename, file_obj, content_type).
     The file_obj is a BytesIO instance ready for multipart uploads.
     Raises ValueError if the URL is invalid, doesn't point to an image,
     the image is empty, or exceeds max_bytes.
+
+    Optional referer can be provided for sites that require it.
     """
     parsed_url = urlparse(url)
     if parsed_url.scheme not in ('http', 'https'):
         raise ValueError('URL must use http or https.')
 
-    req = Request(url, headers={
-                  'User-Agent': USER_AGENT})
-    with urlopen(req, timeout=15) as response:
-        content_type = response.headers.get_content_type()
+    headers = {'User-Agent': USER_AGENT}
+    if referer:
+        headers['Referer'] = referer
+
+    try:
+        response = requests.get(url, headers=headers, timeout=15, stream=True)
+        response.raise_for_status()
+
+        content_type = response.headers.get('Content-Type', '')
         if not content_type.startswith('image/'):
             raise ValueError(
                 f'URL does not point to an image. Got: {content_type}')
 
-        image_bytes = response.read(max_bytes + 1)
+        image_bytes = b''
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk:
+                image_bytes += chunk
+                if len(image_bytes) > max_bytes:
+                    raise ValueError(
+                        f'Image exceeds maximum allowed size of {max_bytes / 1024 / 1024:.0f} MB.')
+
         if not image_bytes:
             raise ValueError('Downloaded image is empty.')
-        if len(image_bytes) > max_bytes:
-            raise ValueError(
-                f'Image exceeds maximum allowed size of {max_bytes / 1024 / 1024:.0f} MB.')
+
+    except requests.RequestException as e:
+        raise ValueError(f'Failed to download image: {e}') from e
 
     filename = os.path.basename(parsed_url.path) or 'downloaded_image'
     if not os.path.splitext(filename)[1]:

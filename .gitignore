@@ -27,3 +27,5 @@ dist-ssr
 # Python cache
 __pycache__/
 *.py[cod]
+
+backend_db/app.db
