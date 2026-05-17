@@ -30,7 +30,7 @@ def create_entry():
 @data_bp.route('/data', methods=['GET'])
 @jwt_required()
 def get_all_entries():
-    """ Hämta alla dataposter (ingen filtrering per användare). """
+    """Return all saved entries ordered by latest date first."""
     entries = SavedData.query.order_by(SavedData.date.desc()).all()
     return jsonify([entry.to_dict() for entry in entries]), 200
 
@@ -38,7 +38,7 @@ def get_all_entries():
 @data_bp.route('/data/<int:entry_id>', methods=['GET'])
 @jwt_required()
 def get_entry(entry_id):
-    """ Hämta en specifik datapost. """
+    """Return one saved entry by id."""
     entry = SavedData.query.get(entry_id)
     if not entry:
         return jsonify({'message': 'Datapost hittades inte'}), 404
@@ -48,7 +48,7 @@ def get_entry(entry_id):
 @data_bp.route('/data/<int:entry_id>', methods=['PUT'])
 @jwt_required()
 def update_entry(entry_id):
-    """ Uppdatera en befintlig datapost. Endast skickade fält uppdateras. """
+    """Update a saved entry; only provided fields are modified."""
     entry = SavedData.query.get(entry_id)
     if not entry:
         return jsonify({'message': 'Datapost hittades inte'}), 404
@@ -83,7 +83,7 @@ def update_entry(entry_id):
 @data_bp.route('/data/<int:entry_id>', methods=['DELETE'])
 @jwt_required()
 def delete_entry(entry_id):
-    """ Ta bort en datapost. """
+    """Delete one saved entry by id."""
     entry = SavedData.query.get(entry_id)
     if not entry:
         return jsonify({'message': 'Datapost hittades inte'}), 404
@@ -95,7 +95,7 @@ def delete_entry(entry_id):
 
 @data_bp.route('/data/stats', methods=['GET'])
 def get_stats():
-    """Gather stats for the stats page piecharts."""
+    """Return aggregate stats used by the statistics dashboard."""
     entries = SavedData.query.order_by(
         SavedData.date.desc(), SavedData.id.desc()
     ).all()

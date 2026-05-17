@@ -3,14 +3,7 @@ from extensions import db
 
 
 class JWTBlocklist(db.Model):
-    """
-    Lagrar återkallade JWT-tokens (utloggade / spärrade).
-
-    Attributes:
-        id:          Primärnyckel
-        jti:         Unik JWT-identifierare (från tokenens payload)
-        revoked_at:  När tokenet spärrades
-    """
+    """Stores revoked JWT token identifiers (jti values)."""
     __tablename__ = 'jwt_blocklist'
 
     id         = db.Column(db.Integer, primary_key=True)

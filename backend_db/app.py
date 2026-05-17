@@ -1,3 +1,5 @@
+"""Flask application factory and extension/bootstrap wiring."""
+
 from flask import Flask
 from flask_cors import CORS
 from config import config
@@ -7,7 +9,15 @@ import os
 
 
 def create_app(env=None):
-    """ Application factory – skapar och konfigurerar Flask-appen """
+    """Create and configure the Flask application instance.
+
+    Args:
+        env: Optional environment key used to select configuration.
+             Falls back to the FLASK_ENV environment variable.
+
+    Returns:
+        A configured Flask app with extensions, JWT callbacks and blueprints.
+    """
     app = Flask(__name__)
 
     # Ladda konfiguration

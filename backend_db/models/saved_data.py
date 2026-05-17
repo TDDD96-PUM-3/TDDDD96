@@ -1,7 +1,10 @@
+"""SQLAlchemy model for persisted scrape results."""
+
 from extensions import db
 
 
 class SavedData(db.Model):
+    """Stores one scrape result with website and counterfeiting metadata."""
     __tablename__ = 'saved_data'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -11,11 +14,12 @@ class SavedData(db.Model):
     tot_image_count = db.Column(db.Float, nullable=True)
     date = db.Column(db.Date, nullable=False)
 
-    # TODO: lägg till fler kolumner här efter behov, t.ex.:
+    # Add more optional columns here as project scope grows, e.g.:
     # category = db.Column(db.String(100))
     # is_public = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
+        """Serialize model fields for JSON API responses."""
         return {
             'id':      self.id,
             'webname': self.webname,

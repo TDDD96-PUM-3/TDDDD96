@@ -1,3 +1,5 @@
+"""Utilities for scraping URLs, calling the AI service, and shaping responses."""
+
 import mimetypes
 import os
 from io import BytesIO
@@ -26,7 +28,7 @@ def compose_result_db(url, result, websitename, total_images):
 
 
 def compose_result_frontend(websitename, url, flagged_images):
-    """ Helper function to compose a result for sending to the frontend."""
+    """Create the response payload format expected by the frontend client."""
     return {
         'name': websitename,
         'link': url,
@@ -41,18 +43,13 @@ def compose_result_frontend(websitename, url, flagged_images):
 
 
 def process_url_scrape(url):
-    """Main function for scraping a URL, detects counterfeits
-    and saves the result to the database. This function is called
-    from scrape_url route.
-
-    It scrapes the given URL, extracts all image URLs, and gets evaulated 
-    by the Ai API. The final result is composed and save to db.
+    """Scrape one page URL, run AI checks, and persist the result.
 
     Args:
-        url: The website URL to scrape
+        url: Website URL to scrape.
 
     Returns:
-        dict: Result dictionary with keys: name, link, counterfeit, date
+        dict: Frontend payload with website metadata and flagged images.
     """
     driver = build_driver()
     data = get_scraping_data(url, driver)
@@ -90,8 +87,10 @@ def process_url_scrape(url):
 
 
 def get_copycat_result(image_urls, referer=None):
-    """Send scraped image URLs to Copycat API and return amount of counterfeit images detected
-    on a website url. Has some error handling.
+    """Call the Copycat API for each image and count flagged predictions.
+
+    Returns:
+        tuple[int, list[dict]]: Counterfeit count and flagged image metadata.
     """
     if not image_urls:
         raise ValueError('No image URLs provided for model inference.')
@@ -128,13 +127,13 @@ def get_copycat_result(image_urls, referer=None):
 
 
 def img_url_to_file(url, max_bytes=MAX_IMAGE_BYTES, referer=None):
-    """Download an image URL and return it as an in-memory file object.
-    Returns a tuple: (filename, file_obj, content_type).
-    The file_obj is a BytesIO instance ready for multipart uploads.
-    Raises ValueError if the URL is invalid, doesn't point to an image,
-    the image is empty, or exceeds max_bytes.
+    """Download an image URL and return a multipart-ready in-memory file.
 
-    Optional referer can be provided for sites that require it.
+    Returns:
+        tuple[str, BytesIO, str]: filename, file object, and content type.
+
+    Raises:
+        ValueError: If URL/protocol/content/size validation fails.
     """
     parsed_url = urlparse(url)
     if parsed_url.scheme not in ('http', 'https'):

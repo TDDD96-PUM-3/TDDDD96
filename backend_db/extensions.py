@@ -2,8 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 
-# Initieras här, kopplas till appen i app.py via init_app()
-# Importera dessa instanser i modeller och routes – aldrig skapa nya
+# Initialized here and bound to the app in app.py via init_app().
+# Import these instances in models/routes; do not create new ones per module.
 db = SQLAlchemy()
 jwt = JWTManager()
 bcrypt = Bcrypt()

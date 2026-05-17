@@ -1,3 +1,8 @@
+"""Pytest suite for auth and saved-data stats endpoints.
+
+These tests are intended to run in CI/local using a temporary SQLite database.
+"""
+
 import tempfile
 import os
 from datetime import date
@@ -11,7 +16,8 @@ from models.saved_data import SavedData
 
 @pytest.fixture()
 def app():
-    # Create temporary SQLite database for testing
+    """Create a test Flask app backed by a temporary SQLite database."""
+    # Create temporary SQLite database for test isolation.
     db_fd, db_path = tempfile.mkstemp()
     test_app = create_app()
     test_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
