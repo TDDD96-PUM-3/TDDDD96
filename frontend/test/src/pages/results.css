@@ -27,9 +27,23 @@
 
 .product-container img {
   width: 100%;
-  height: 60%;
+  height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.product-image {
+  width: 100%;
+  height: 60%;
+  background: #eef2f1;
+}
+
+.empty-results {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 30px;
+  color: #00402f;
+  font-weight: 600;
 }
 
 .product-link {
@@ -71,16 +85,24 @@
   padding: 20px;
 }
 
-.bar {
+.prediction {
   position: absolute;
   left: 20px;
   right: 20px;
   bottom: 20px;
 }
 
+.prediction p {
+  margin: 0;
+  color: #00402f;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
 .bar-text {
   position: absolute;
-  bottom: 27px;
+  bottom: 48px;
 }
 
 .sort-controls {
@@ -91,7 +113,7 @@
 
   background: #ffffff;
   /* padding: 6px 12px; */
-  border-radius: 999px; /* pill-shape som känns modern */
+  border-radius: 999px; /* pill-shape som kÃ¤nns modern */
   /*border: 1px solid rgb(197, 197, 197);*/
   transition: box-shadow 0.2s ease;
 }
@@ -122,7 +144,7 @@
 }
 
 .sort-controls::after {
-  /* content: "▾"; */
+  /* content: "â–¾"; */
   position: absolute;
   right: 10px;
   pointer-events: pointer;

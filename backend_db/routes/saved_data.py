@@ -17,6 +17,7 @@ def create_entry():
         'name': data.get('webname'),
         'link': data.get('url'),
         'counterfeit': data.get('result'),
+        'total_img': data.get('total'),
         'date': data.get('date')
     }
     try:
