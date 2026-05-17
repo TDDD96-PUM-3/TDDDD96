@@ -1,10 +1,17 @@
-# TDDD96
+# Counterfiet detector webapp
+
+This repository is for a webapp used to check counterfiet by checking links.
+
+## Overview
 
 This repository contains three main parts:
 
-- `backend_db`: Flask API and database handling
-- `copycat_api_tddd96`: image similarity service
-- `frontend/test`: React frontend
+1.  [backend_db](backend_db/README.md) Flask API and database handling
+    - Uses port 8000
+2.  `copycat_api_tddd96` image similarity service
+    - Uses port 3100
+3.  [frontend/test](frontend/test/README.md) React frontend
+    - Uses port 5173
 
 ## Docker Setup
 
@@ -20,8 +27,6 @@ docker compose up --build
 3. Open the apps in your browser:
 
 - Frontend: http://localhost:5173
-- Backend API: http://localhost:8000
-- Copycat API: http://localhost:3100
 
 4. When you are done, stop the services:
 
@@ -29,7 +34,7 @@ docker compose up --build
 docker compose down
 ```
 
-## Non-Docker Setup
+## Standalone Setup
 
 Use this if you want to run each service locally without containers.
 
@@ -83,7 +88,7 @@ npm run dev
 
 4. Open the frontend at http://localhost:5173
 
-## Extension Setup - MAybe update/remove
+## Extension Setup
 
 1. Open this folder in VS Code.
 2. Install recommended extensions when prompted.
