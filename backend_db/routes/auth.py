@@ -9,21 +9,21 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    """ Registrera ny användare """
+    """Register a new user account."""
     data = request.get_json() or {}
     username = data.get('username')
     password = data.get('password')
 
-    # Validera att nödvändiga fält finns
+    # Validate required input fields.
     if not username or not password:
         return jsonify({'message': 'username och password krävs'}), 400
 
-    # Kontrollera om användarnamnet redan finns
+    # Ensure username uniqueness.
     existing_user = User.query.filter_by(username=username).first()
     if existing_user:
         return jsonify({'message': 'Användarnamnet är redan taget'}), 409
 
-    # Skapa och spara användaren
+    # Persist the user.
     user = User(username=username, password=password)
     db.session.add(user)
     db.session.commit()
@@ -36,24 +36,23 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    """ Logga in och få en JWT-token """
+    """Authenticate user credentials and issue an access token."""
     data = request.get_json() or {}
     username = data.get('username')
     password = data.get('password')
 
-    # Kontrollera att båda fälten skickats med
+    # Validate required input fields.
     if not username or not password:
         return jsonify({'message': 'username och password krävs'}), 400
 
-    # Hitta användaren i databasen
+    # Look up user.
     user = User.query.filter_by(username=username).first()
 
-    # Verifiera användare och lösenord
+    # Verify credentials.
     if not user or not user.check_password(password):
         return jsonify({'message': 'Fel användarnamn eller lösenord'}), 401
 
-    # JWT-identiteten sätts till användarens id så att den enkelt kan hämtas
-    # via get_jwt_identity() i skyddade routes.
+    # Identity is the user id, available via get_jwt_identity().
     access_token = create_access_token(
         identity=str(user.id),
         expires_delta=timedelta(hours=1)
@@ -69,11 +68,11 @@ def login():
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
-    """ Logga ut och spärra token genom att lägga jti i blocklist-tabellen. """
+    """Log out by revoking the current token via JWT blocklist."""
     jti = get_jwt().get('jti')
 
     if jti:
-        # Undvik dubbletter om samma token loggas ut två gånger
+        # Avoid duplicate rows if same token is logged out twice.
         already_revoked = JWTBlocklist.query.filter_by(jti=jti).first()
         if not already_revoked:
             db.session.add(JWTBlocklist(jti=jti))

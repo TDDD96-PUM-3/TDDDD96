@@ -45,6 +45,7 @@ log = logging.getLogger(__name__)
 # ── URL helpers ────────────────────────────────────────────────────────────────
 
 def is_valid_url(url: str) -> bool:
+    """Return True for absolute http/https URLs with a non-empty host."""
     try:
         p = urlparse(url)
         return p.scheme in ("http", "https") and bool(p.netloc)
@@ -61,18 +62,16 @@ def resolve_url(href: str, base_url: str) -> str | None:
 
 
 def get_website_name(url: str) -> str:
+    """Extract a readable site name from a URL hostname."""
     netloc = urlparse(url).netloc.lower().replace("www.", "")
     return netloc.split(".")[0]
 
 
 def image_extension_regex() -> re.Pattern:
-    # Match common image extensions in URLs (e.g. ?fmt=jpg)
+    """Compile regex used to recognize common image URL patterns."""
     img_ext = re.compile(
-        # extension anywhere before params
         r'\.(jpg|jpeg|png|webp|gif|pjpeg)(\?[^&]*)?(&.*)?$'
-        # fmt= query param
         r'|[?&]fmt=(jpg|jpeg|png|webp|gif|pjpeg)'
-        # Scene7 / AEM image URLs
         r'|/is/image/',
         re.I
     )
@@ -83,6 +82,7 @@ def image_extension_regex() -> re.Pattern:
 
 
 def build_driver(headless: bool = True) -> webdriver.Chrome:
+    """Create and configure a Selenium Chrome driver instance."""
     options = Options()
     if headless:
         options.add_argument("--headless")
@@ -168,7 +168,6 @@ def extract_images(soup: BeautifulSoup, base_url: str) -> list[str]:
                 if full:
                     images.add(full)
 
-        # Handle srcset separately — it's a comma-separated list of "url width" pairs
         srcset = tag.get('srcset', '')
         for part in srcset.split(','):
             parts = part.strip().split()
@@ -200,9 +199,7 @@ def scrape(url: str, driver: webdriver.Chrome, timeout: int = 15, headless: bool
 
         loaded = wait_for_page(driver, timeout)
         if not loaded:
-            # Still try — partial content is better than nothing
             log.warning("Proceeding with partially loaded page.")
-            # return None ?
         website_name = get_website_name(url)
         html = driver.page_source
 

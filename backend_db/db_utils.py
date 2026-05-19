@@ -1,9 +1,18 @@
+"""Database helper functions for persisting scrape results and statistics."""
+
 from datetime import datetime, date as date_cls
 from extensions import db
 from models import SavedData
 
 
 def _parse_date(value):
+    """Parse an ISO date string (YYYY-MM-DD).
+
+    Returns:
+        date: Parsed date object for valid input.
+        None: Missing/empty input.
+        False: Invalid format.
+    """
     if value is None or value == '':
         return None
     try:
@@ -44,6 +53,7 @@ def save_result_to_db(result):
 
 
 def build_stats_payload(entries):
+    """Build aggregate statistics payload for the dashboard endpoint."""
     total_web = len(entries)
     flagged_web = sum(1 for entry in entries if entry.counterfeit_count > 0)
     total_img = sum((entry.tot_image_count or 0) for entry in entries)
