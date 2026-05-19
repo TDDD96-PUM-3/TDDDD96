@@ -6,14 +6,14 @@ This repository is for a webapp used to check counterfiet by checking links.
 
 This repository contains three main parts:
 
-1.  [backend_db](backend_db/README.md) Flask API and database handling
+1.  [backend_db](backend_db/README.md) Scrape logic, Flask API and database handling
     - Uses port 8000
 2.  `copycat_api_tddd96` image similarity service
     - Uses port 3100
 3.  [frontend/test](frontend/test/README.md) React frontend
     - Uses port 5173
 
-## Docker Setup
+## Docker Quickstart
 
 Use Docker if you want the full stack running with one command.
 
@@ -103,3 +103,11 @@ This project uses format-on-save in the workspace:
 - ESLint fixes on save
 
 See [extensions.md](extensions.md) for extension details and setup instructions.
+
+## Further Work
+
+- `backend_db` Support production DB, for example mySQL or PostgresSQL using `ProductionConfig` in [config.py](backend_db/config.py)
+- `backend_db` Support more image formats in [universal_scraper.py](backend_db/universal_scraper.py)
+- `backend_db` Add more robust popup/cookie handling for [universal_scraper.py](backend_db/universal_scraper.py)
+- JWT token handling for a log in based system
+- Environment varible handling with an .env file
